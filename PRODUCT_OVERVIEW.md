@@ -1,7 +1,7 @@
-# ParkingSpots Platform
+# Urbee Platform
 
 <div align="center">
-  <img src="urbee.jpg" alt="ParkingSpots Logo" width="200" />
+  <img src="urbee.jpg" alt="Urbee Logo" width="200" />
 </div>
 
 ## Product Overview & User Guide

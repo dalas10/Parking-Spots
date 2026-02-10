@@ -1,6 +1,6 @@
-# ParkingSpots Platform
+# Urbee Platform
 
-![ParkingSpots Logo](urbee.jpg)
+![Urbee Logo](urbee.jpg)
 
 ## Software Development Proposal & Agreement
 

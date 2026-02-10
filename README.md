@@ -1,10 +1,10 @@
-# ParkingSpots 🅿️
+# Urbee 🅿️
 
-<img src="urbee.jpg" alt="ParkingSpots Logo" width="150" />
+<img src="urbee.jpg" alt="Urbee Logo" width="150" />
 
 **Brand Color**: <span style="color:#fdb82e">●</span> #fdb82e (Urbee Gold)
 
-A full-stack parking space rental marketplace where property owners can list their parking spots and users can search, book, and pay for parking through a mobile app.
+Urbee - A full-stack parking space rental marketplace where property owners can list their parking spots and users can search, book, and pay for parking through a mobile app.
 
 ## Features
 

@@ -1,6 +1,6 @@
-# ParkingSpots - Technical Documentation
+# Urbee - Technical Documentation
 
-![ParkingSpots](urbee.jpg)
+![Urbee](urbee.jpg)
 
 **Version:** 2.0.0 - Production Ready  
 **Date:** February 10, 2026  

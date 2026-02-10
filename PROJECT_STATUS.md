@@ -1,4 +1,4 @@
-# ParkingSpots - Project Status & Checklist
+# Urbee - Project Status & Checklist
 
 **Last Updated:** February 9, 2026  
 **Project Status:** ✅ Backend Complete & Running | ⏳ Mobile App Ready (Not Running)
