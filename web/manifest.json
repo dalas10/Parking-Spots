@@ -1,11 +1,11 @@
 {
-  "name": "ParkingSpots - Rent Parking Spaces",
-  "short_name": "ParkingSpots",
+  "name": "Urbee - Rent Parking Spaces",
+  "short_name": "Urbee",
   "description": "Find and rent parking spaces from local owners. Easy, convenient, and affordable.",
   "start_url": "/index.html",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#4CAF50",
+  "theme_color": "#fdb82e",
   "orientation": "portrait-primary",
   "icons": [
     {

@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "ParkingSpots",
-    "slug": "parkingspots",
+    "name": "Urbee",
+    "slug": "urbee",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -16,7 +16,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.parkingspots.app",
+      "bundleIdentifier": "com.urbee.app",
       "config": {
         "googleMapsApiKey": "YOUR_GOOGLE_MAPS_API_KEY"
       },
@@ -30,7 +30,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#4F46E5"
       },
-      "package": "com.parkingspots.app",
+      "package": "com.urbee.app",
       "permissions": [
         "ACCESS_COARSE_LOCATION",
         "ACCESS_FINE_LOCATION"
@@ -49,13 +49,13 @@
       [
         "expo-location",
         {
-          "locationAlwaysAndWhenInUsePermission": "Allow ParkingSpots to use your location to find parking near you."
+          "locationAlwaysAndWhenInUsePermission": "Allow Urbee to use your location to find parking near you."
         }
       ],
       [
         "expo-image-picker",
         {
-          "photosPermission": "Allow ParkingSpots to access your photos to upload parking spot images."
+          "photosPermission": "Allow Urbee to access your photos to upload parking spot images."
         }
       ]
     ]

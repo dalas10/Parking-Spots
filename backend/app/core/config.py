@@ -3,7 +3,7 @@ from pydantic_settings import BaseSettings
 from pydantic import AnyHttpUrl, field_validator
 
 class Settings(BaseSettings):
-    PROJECT_NAME: str = "ParkingSpots"
+    PROJECT_NAME: str = "Urbee"
     API_V1_STR: str = "/api/v1"
     
     # Database

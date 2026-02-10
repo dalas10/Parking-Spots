@@ -1,4 +1,4 @@
-const CACHE_NAME = 'parkingspots-v1';
+const CACHE_NAME = 'urbee-v1';
 const urlsToCache = [
   '/',
   '/index.html',

@@ -52,7 +52,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
-    description="API for ParkingSpots - A parking space rental marketplace",
+    description="API for Urbee - A modern parking space rental marketplace",
     version="1.0.0",
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
     lifespan=lifespan
@@ -73,7 +73,7 @@ app.include_router(api_router, prefix=settings.API_V1_STR)
 @app.get("/")
 async def root():
     return {
-        "message": "Welcome to ParkingSpots API",
+        "message": "Welcome to Urbee API",
         "docs": "/docs",
         "version": "1.0.0"
     }
