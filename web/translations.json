@@ -32,7 +32,8 @@
       "driveway": "Driveway",
       "lot": "Lot",
       "ev_charging": "EV Charging",
-      "covered_filter": "Covered"
+      "covered_filter": "Covered",
+      "clear": "Clear Filters"
     },
     "spot": {
       "title": "Available Parking Spots",
@@ -188,7 +189,8 @@
       "driveway": "Δρόμος",
       "lot": "Πάρκινγκ",
       "ev_charging": "Φόρτιση EV",
-      "covered_filter": "Στεγασμένο"
+      "covered_filter": "Στεγασμένο",
+      "clear": "Καθαρισμός Φίλτρων"
     },
     "spot": {
       "title": "Διαθέσιμες Θέσεις Στάθμευσης",

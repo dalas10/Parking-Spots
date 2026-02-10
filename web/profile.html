@@ -16,12 +16,6 @@
                 <img src="assets/logo.jpg" alt="Urbee" style="height: 32px; vertical-align: middle; border-radius: 4px; margin-right: 8px;">
                 <span>Urbee</span>
             </div>
-            <div class="nav-links" id="navLinks">
-                <a href="index.html" data-i18n="nav.home">Home</a>
-                <a href="bookings.html" data-i18n="nav.bookings">My Bookings</a>
-                <a href="profile.html" class="active" data-i18n="nav.profile">Profile</a>
-                <button class="btn-logout" id="btnLogout" data-i18n="nav.logout">Logout</button>
-            </div>
         </div>
     </nav>
 
@@ -89,6 +83,31 @@
             </div>
         </div>
     </main>
+
+    <footer class="footer">
+        <nav class="bottom-nav">
+            <a href="index.html" class="nav-item">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label" data-i18n="nav.home">Home</span>
+            </a>
+            <a href="bookings.html" id="navBookings" class="nav-item" style="display: none;">
+                <span class="nav-icon">📋</span>
+                <span class="nav-label" data-i18n="nav.bookings">Bookings</span>
+            </a>
+            <a href="profile.html" id="navProfile" class="nav-item active" style="display: none;">
+                <span class="nav-icon">👤</span>
+                <span class="nav-label" data-i18n="nav.profile">Profile</span>
+            </a>
+            <a href="login.html" id="navLogin" class="nav-item">
+                <span class="nav-icon">🔑</span>
+                <span class="nav-label" data-i18n="nav.login">Login</span>
+            </a>
+            <button class="nav-item btn-logout" id="btnLogout" style="display: none;" onclick="logout()">
+                <span class="nav-icon">🚪</span>
+                <span class="nav-label" data-i18n="nav.logout">Logout</span>
+            </button>
+        </nav>
+    </footer>
 
     <script src="auth.js"></script>
     <script src="api.js"></script>

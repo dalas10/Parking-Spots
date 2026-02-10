@@ -22,13 +22,6 @@
                 <img src="assets/logo.jpg" alt="Urbee" style="height: 32px; vertical-align: middle; border-radius: 4px; margin-right: 8px;">
                 <span>Urbee</span>
             </div>
-            <div class="nav-links" id="navLinks">
-                <a href="index.html" data-i18n="nav.home">Home</a>
-                <a href="bookings.html" id="navBookings" style="display: none;" data-i18n="nav.bookings">My Bookings</a>
-                <a href="profile.html" id="navProfile" style="display: none;" data-i18n="nav.profile">Profile</a>
-                <a href="login.html" id="navLogin" data-i18n="nav.login">Login</a>
-                <button class="btn-logout" id="btnLogout" style="display: none;" data-i18n="nav.logout">Logout</button>
-            </div>
         </div>
     </nav>
 
@@ -96,6 +89,7 @@
                     <input type="checkbox" id="filterCovered" onchange="applyFilters()">
                     <span data-i18n="filters.covered_filter">Covered</span>
                 </label>
+                <button class="btn-secondary" onclick="clearFilters()" data-i18n="filters.clear">🗑️ Clear Filters</button>
             </div>
             
             <div id="mapContainer" class="map-container">
@@ -118,9 +112,28 @@
     </section>
 
     <footer class="footer">
-        <div class="container">
-            <p data-i18n="footer.copyright">&copy; 2026 Urbee. All rights reserved.</p>
-        </div>
+        <nav class="bottom-nav">
+            <a href="index.html" class="nav-item active">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label" data-i18n="nav.home">Home</span>
+            </a>
+            <a href="bookings.html" id="navBookings" class="nav-item" style="display: none;">
+                <span class="nav-icon">📋</span>
+                <span class="nav-label" data-i18n="nav.bookings">Bookings</span>
+            </a>
+            <a href="profile.html" id="navProfile" class="nav-item" style="display: none;">
+                <span class="nav-icon">👤</span>
+                <span class="nav-label" data-i18n="nav.profile">Profile</span>
+            </a>
+            <a href="login.html" id="navLogin" class="nav-item">
+                <span class="nav-icon">🔑</span>
+                <span class="nav-label" data-i18n="nav.login">Login</span>
+            </a>
+            <button class="nav-item btn-logout" id="btnLogout" style="display: none;" onclick="logout()">
+                <span class="nav-icon">🚪</span>
+                <span class="nav-label" data-i18n="nav.logout">Logout</span>
+            </button>
+        </nav>
     </footer>
 
     <script src="auth.js"></script>

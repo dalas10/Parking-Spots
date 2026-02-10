@@ -7,6 +7,34 @@ let currentView = 'map';
 
 // Load parking spots on page load
 document.addEventListener('DOMContentLoaded', () => {
+    // Try to restore previous filter values from localStorage
+    const savedDate = localStorage.getItem('filterStartDate');
+    const savedTime = localStorage.getItem('filterStartTime');
+    const savedDuration = localStorage.getItem('filterDuration');
+    
+    if (savedDate && savedTime && savedDuration) {
+        // Restore saved filters
+        document.getElementById('filterStartDate').value = savedDate;
+        document.getElementById('filterStartTime').value = savedTime;
+        document.getElementById('filterDuration').value = savedDuration;
+    } else {
+        // Set default date/time filters to current time + 1 hour duration
+        const now = new Date();
+        document.getElementById('filterStartDate').value = now.toISOString().split('T')[0];
+        document.getElementById('filterStartTime').value = now.toTimeString().slice(0, 5);
+        document.getElementById('filterDuration').value = '1';
+    }
+    
+    // Add Enter key handler for search input
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                searchParking();
+            }
+        });
+    }
+    
     initializeMap();
     loadParkingSpots();
     loadStats();
@@ -59,6 +87,16 @@ function addMarkerForSpot(spot) {
         ? `${spot.total_reviews} ${window.t ? t('spot.reviews') : 'reviews'}`
         : (window.t ? t('spot.no_reviews') : 'No reviews yet');
     
+    // Build URL with filter parameters
+    const startDate = document.getElementById('filterStartDate')?.value;
+    const startTime = document.getElementById('filterStartTime')?.value;
+    const duration = document.getElementById('filterDuration')?.value;
+    
+    let spotUrl = `spot.html?id=${spot.id}`;
+    if (startDate && startTime && duration) {
+        spotUrl += `&date=${startDate}&time=${startTime}&duration=${duration}`;
+    }
+    
     const popupContent = `
         <div class="map-popup">
             <h3>${spot.title}</h3>
@@ -66,7 +104,7 @@ function addMarkerForSpot(spot) {
             ${features.length > 0 ? `<p>${features.join(' • ')}</p>` : ''}
             <div class="price">${formatCurrency(spot.hourly_rate)}${window.t ? t('spot.per_hour') : '/hr'}</div>
             ${spot.average_rating ? `<p>⭐ ${spot.average_rating.toFixed(1)} (${reviewsText})</p>` : ''}
-            <a href="spot.html?id=${spot.id}" class="btn-view">${window.t ? t('bookings.view_details') : 'View Details'}</a>
+            <a href="${spotUrl}" class="btn-view" onclick="if ('${startDate}') localStorage.setItem('filterStartDate', '${startDate}'); if ('${startTime}') localStorage.setItem('filterStartTime', '${startTime}'); if ('${duration}') localStorage.setItem('filterDuration', '${duration}');">${window.t ? t('bookings.view_details') : 'View Details'}</a>
         </div>
     `;
     
@@ -118,6 +156,48 @@ function applyFilters() {
     loadParkingSpots();
 }
 
+// Clear all filters
+function clearFilters() {
+    console.log('clearFilters() called');
+    
+    // Clear localStorage
+    localStorage.removeItem('filterStartDate');
+    localStorage.removeItem('filterStartTime');
+    localStorage.removeItem('filterDuration');
+    
+    // Reset to default values (current time)
+    const now = new Date();
+    const dateInput = document.getElementById('filterStartDate');
+    const timeInput = document.getElementById('filterStartTime');
+    const durationInput = document.getElementById('filterDuration');
+    
+    if (dateInput) dateInput.value = now.toISOString().split('T')[0];
+    if (timeInput) timeInput.value = now.toTimeString().slice(0, 5);
+    if (durationInput) durationInput.value = '1';
+    
+    // Clear other filters
+    const citySelect = document.getElementById('filterCity');
+    const typeSelect = document.getElementById('filterType');
+    const evCheckbox = document.getElementById('filterEV');
+    const coveredCheckbox = document.getElementById('filterCovered');
+    
+    if (citySelect) citySelect.value = '';
+    if (typeSelect) typeSelect.value = '';
+    if (evCheckbox) evCheckbox.checked = false;
+    if (coveredCheckbox) coveredCheckbox.checked = false;
+    
+    // Clear search input
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.value = '';
+    }
+    
+    console.log('Filters cleared, reloading spots...');
+    
+    // Reload spots with cleared filters
+    loadParkingSpots();
+}
+
 async function loadParkingSpots() {
     const loadingSpots = document.getElementById('loadingSpots');
     const spotsGrid = document.getElementById('spotsGrid');
@@ -133,6 +213,11 @@ async function loadParkingSpots() {
         const startDate = document.getElementById('filterStartDate')?.value;
         const startTime = document.getElementById('filterStartTime')?.value;
         const duration = document.getElementById('filterDuration')?.value;
+        
+        // Save filter values to localStorage
+        if (startDate) localStorage.setItem('filterStartDate', startDate);
+        if (startTime) localStorage.setItem('filterStartTime', startTime);
+        if (duration) localStorage.setItem('filterDuration', duration);
         
         const filters = {
             city: filterCity?.value || '',
@@ -199,7 +284,25 @@ async function loadParkingSpots() {
 function createSpotCard(spot) {
     const card = document.createElement('div');
     card.className = 'spot-card';
-    card.onclick = () => window.location.href = `spot.html?id=${spot.id}`;
+    
+    // Get current filter values to pass to spot details
+    const startDate = document.getElementById('filterStartDate')?.value;
+    const startTime = document.getElementById('filterStartTime')?.value;
+    const duration = document.getElementById('filterDuration')?.value;
+    
+    // Build URL with query parameters
+    let spotUrl = `spot.html?id=${spot.id}`;
+    if (startDate && startTime && duration) {
+        spotUrl += `&date=${startDate}&time=${startTime}&duration=${duration}`;
+    }
+    
+    card.onclick = () => {
+        // Save filter values to localStorage before navigating
+        if (startDate) localStorage.setItem('filterStartDate', startDate);
+        if (startTime) localStorage.setItem('filterStartTime', startTime);
+        if (duration) localStorage.setItem('filterDuration', duration);
+        window.location.href = spotUrl;
+    };
     
     const features = [];
     if (spot.is_covered) features.push(window.t ? t('filters.covered') : 'Covered');
@@ -240,29 +343,50 @@ async function searchParking() {
         return;
     }
     
-    // Filter spots by search query
-    const filtered = allSpots.filter(spot => 
-        spot.title.toLowerCase().includes(query.toLowerCase()) ||
-        spot.city.toLowerCase().includes(query.toLowerCase()) ||
-        spot.zip_code.includes(query) ||
-        spot.address.toLowerCase().includes(query.toLowerCase())
-    );
-    
+    const loadingSpots = document.getElementById('loadingSpots');
     const spotsGrid = document.getElementById('spotsGrid');
     const noSpots = document.getElementById('noSpots');
     
+    loadingSpots.style.display = 'block';
     spotsGrid.innerHTML = '';
     noSpots.style.display = 'none';
     
-    if (filtered.length === 0) {
+    try {
+        // Search across all spots without other filters
+        const spots = await searchParkingSpots({ limit: 100 });
+        
+        // Filter by search query
+        const filtered = spots.filter(spot => 
+            spot.title.toLowerCase().includes(query.toLowerCase()) ||
+            spot.city.toLowerCase().includes(query.toLowerCase()) ||
+            spot.zip_code.includes(query) ||
+            spot.address.toLowerCase().includes(query.toLowerCase())
+        );
+        
+        allSpots = filtered;
+        loadingSpots.style.display = 'none';
+        
+        if (filtered.length === 0) {
+            noSpots.style.display = 'block';
+            // Clear map markers if no results
+            markers.forEach(marker => map.removeLayer(marker));
+            markers = [];
+            return;
+        }
+        
+        // Update list view
+        filtered.forEach(spot => {
+            const card = createSpotCard(spot);
+            spotsGrid.appendChild(card);
+        });
+        
+        // Update map view with filtered results
+        updateMapWithSpots(filtered);
+    } catch (error) {
+        console.error('Search error:', error);
+        loadingSpots.style.display = 'none';
         noSpots.style.display = 'block';
-        return;
     }
-    
-    filtered.forEach(spot => {
-        const card = createSpotCard(spot);
-        spotsGrid.appendChild(card);
-    });
 }
 
 async function loadStats() {

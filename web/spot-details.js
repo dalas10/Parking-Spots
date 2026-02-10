@@ -1,6 +1,21 @@
 // Spot details page
 let currentSpot = null;
 
+// Helper function to format date to date input format (YYYY-MM-DD)
+function formatDate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+// Helper function to format time to time input format (HH:MM)
+function formatTime(date) {
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}`;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const spotId = urlParams.get('id');
@@ -10,11 +25,42 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
     
-    loadSpotDetails(spotId);
+    // Pre-fill booking form after a brief delay to ensure DOM is ready
+    const filterDate = urlParams.get('date');
+    const filterTime = urlParams.get('time');
+    const filterDuration = urlParams.get('duration');
     
-    // Update cost when times change
-    document.getElementById('startTime').addEventListener('change', updateBookingSummary);
-    document.getElementById('endTime').addEventListener('change', updateBookingSummary);
+    // Use setTimeout to ensure form elements are fully rendered
+    setTimeout(() => {
+        const startDateEl = document.getElementById('startDate');
+        const startTimeEl = document.getElementById('startTime');
+        const durationEl = document.getElementById('duration');
+        
+        if (startDateEl && startTimeEl && durationEl) {
+            if (filterDate && filterTime && filterDuration) {
+                // Use filter values from index page
+                startDateEl.value = filterDate;
+                startTimeEl.value = filterTime;
+                durationEl.value = filterDuration;
+            } else {
+                // Use current date/time as default with 1 hour duration
+                const now = new Date();
+                startDateEl.value = formatDate(now);
+                startTimeEl.value = formatTime(now);
+                durationEl.value = '1';
+            }
+            
+            // Update cost after setting values
+            updateBookingSummary();
+        }
+        
+        // Add event listeners for changes
+        startDateEl?.addEventListener('change', updateBookingSummary);
+        startTimeEl?.addEventListener('change', updateBookingSummary);
+        durationEl?.addEventListener('change', updateBookingSummary);
+    }, 100);
+    
+    loadSpotDetails(spotId);
 });
 
 async function loadSpotDetails(spotId) {
@@ -112,6 +158,9 @@ async function loadSpotDetails(spotId) {
                     <a href="login.html" class="btn-primary btn-full">${loginText}</a>
                 </p>
             `;
+        } else {
+            // Update booking summary for pre-filled times
+            setTimeout(() => updateBookingSummary(), 100);
         }
         
         loadingSpot.style.display = 'none';
@@ -159,26 +208,25 @@ async function loadReviews(spotId) {
 }
 
 function updateBookingSummary() {
+    const startDate = document.getElementById('startDate').value;
     const startTime = document.getElementById('startTime').value;
-    const endTime = document.getElementById('endTime').value;
+    const durationHours = parseInt(document.getElementById('duration').value);
     const bookingSummary = document.getElementById('bookingSummary');
     
-    if (!startTime || !endTime || !currentSpot) {
+    if (!startDate || !startTime || !durationHours || !currentSpot) {
         bookingSummary.style.display = 'none';
         return;
     }
     
-    const hours = calculateDuration(startTime, endTime);
-    
-    if (hours <= 0) {
+    if (durationHours <= 0 || durationHours > 24) {
         bookingSummary.style.display = 'none';
         return;
     }
     
-    const { subtotal, serviceFee, total } = calculateBookingCost(currentSpot.hourly_rate, hours);
+    const { subtotal, serviceFee, total } = calculateBookingCost(currentSpot.hourly_rate, durationHours);
     
     const hoursText = window.t ? t('booking.hours') : 'hours';
-    document.getElementById('duration').textContent = `${hours} ${hoursText}`;
+    document.getElementById('durationDisplay').textContent = `${durationHours} ${hoursText}`;
     document.getElementById('subtotal').textContent = formatCurrency(subtotal);
     document.getElementById('serviceFee').textContent = formatCurrency(serviceFee);
     document.getElementById('total').textContent = formatCurrency(total);
@@ -194,12 +242,18 @@ async function handleBooking(e) {
         return;
     }
     
+    const startDate = document.getElementById('startDate').value;
     const startTime = document.getElementById('startTime').value;
-    const endTime = document.getElementById('endTime').value;
+    const durationHours = parseInt(document.getElementById('duration').value);
     const vehiclePlate = document.getElementById('vehiclePlate').value;
     const vehicleMake = document.getElementById('vehicleMake').value;
     const vehicleModel = document.getElementById('vehicleModel').value;
     const vehicleColor = document.getElementById('vehicleColor').value;
+    
+    // Combine date and time to create start and end times
+    const startDateTime = new Date(`${startDate}T${startTime}`);
+    const endDateTime = new Date(startDateTime);
+    endDateTime.setHours(endDateTime.getHours() + durationHours);
     
     const btnBook = document.getElementById('btnBook');
     btnBook.disabled = true;
@@ -208,8 +262,8 @@ async function handleBooking(e) {
     try {
         const booking = await createBooking({
             parking_spot_id: currentSpot.id,
-            start_time: new Date(startTime).toISOString(),
-            end_time: new Date(endTime).toISOString(),
+            start_time: startDateTime.toISOString(),
+            end_time: endDateTime.toISOString(),
             vehicle_plate: vehiclePlate,
             vehicle_make: vehicleMake,
             vehicle_model: vehicleModel,

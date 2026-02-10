@@ -198,31 +198,33 @@ async def list_parking_spots(
     # Use limit if provided, otherwise use page_size
     effective_page_size = limit if limit else page_size
     
-    # Generate cache key from query parameters
-    cache_key = cache.generate_cache_key(
-        "search",
-        latitude=latitude,
-        longitude=longitude,
-        radius_km=radius_km,
-        city=city,
-        spot_type=spot_type,
-        vehicle_size=vehicle_size,
-        max_hourly_rate=max_hourly_rate,
-        has_ev_charging=has_ev_charging,
-        is_covered=is_covered,
-        start_time=start_time,
-        end_time=end_time,
-        page=page,
-        page_size=effective_page_size
-    )
+    # Skip cache when date/time filters are used (availability changes dynamically)
+    use_cache = not (start_time and end_time)
     
-    # Try to get from cache
-    cached_result = await cache.get(cache_key)
-    if cached_result:
-        try:
-            return json.loads(cached_result)
-        except json.JSONDecodeError:
-            pass
+    if use_cache:
+        # Generate cache key from query parameters
+        cache_key = cache.generate_cache_key(
+            "search",
+            latitude=latitude,
+            longitude=longitude,
+            radius_km=radius_km,
+            city=city,
+            spot_type=spot_type,
+            vehicle_size=vehicle_size,
+            max_hourly_rate=max_hourly_rate,
+            has_ev_charging=has_ev_charging,
+            is_covered=is_covered,
+            page=page,
+            page_size=effective_page_size
+        )
+        
+        # Try to get from cache
+        cached_result = await cache.get(cache_key)
+        if cached_result:
+            try:
+                return json.loads(cached_result)
+            except json.JSONDecodeError:
+                pass
     
     query = select(ParkingSpot).where(
         and_(
@@ -256,16 +258,15 @@ async def list_parking_spots(
     if start_time and end_time:
         available_spots = []
         for spot in spots:
-            # Check for conflicting bookings
+            # Check for conflicting bookings using standard interval overlap detection
+            # Two intervals overlap if: start1 < end2 AND end1 > start2
+            # Exclude spots with PENDING, CONFIRMED, or IN_PROGRESS bookings
             booking_query = select(Booking).where(
                 and_(
                     Booking.parking_spot_id == spot.id,
-                    Booking.status.in_([BookingStatus.CONFIRMED, BookingStatus.IN_PROGRESS]),
-                    or_(
-                        and_(Booking.start_time <= start_time, Booking.end_time > start_time),
-                        and_(Booking.start_time < end_time, Booking.end_time >= end_time),
-                        and_(Booking.start_time >= start_time, Booking.end_time <= end_time)
-                    )
+                    Booking.status.in_([BookingStatus.PENDING, BookingStatus.CONFIRMED, BookingStatus.IN_PROGRESS]),
+                    Booking.start_time < end_time,
+                    Booking.end_time > start_time
                 )
             )
             booking_result = await db.execute(booking_query)
@@ -308,11 +309,12 @@ async def list_parking_spots(
     if latitude and longitude:
         response_spots.sort(key=lambda x: x["distance_km"] or float('inf'))
     
-    # Cache the results for 5 minutes (300 seconds)
-    try:
-        await cache.set(cache_key, json.dumps(response_spots, default=str), ttl=300)
-    except Exception as e:
-        print(f"Cache set error: {e}")
+    # Cache the results only if not using date/time filters (300 seconds = 5 minutes)
+    if use_cache:
+        try:
+            await cache.set(cache_key, json.dumps(response_spots, default=str), ttl=300)
+        except Exception as e:
+            print(f"Cache set error: {e}")
     
     return response_spots
 
