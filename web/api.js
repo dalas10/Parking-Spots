@@ -49,6 +49,8 @@ async function searchParkingSpots(params = {}) {
     if (params.has_ev_charging !== undefined) queryParams.append('has_ev_charging', params.has_ev_charging);
     if (params.is_covered !== undefined) queryParams.append('is_covered', params.is_covered);
     if (params.max_price) queryParams.append('max_price', params.max_price);
+    if (params.start_time) queryParams.append('start_time', params.start_time);
+    if (params.end_time) queryParams.append('end_time', params.end_time);
     if (params.limit) queryParams.append('limit', params.limit);
     
     return apiRequest(`/api/v1/parking-spots/?${queryParams.toString()}`);

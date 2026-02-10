@@ -130,6 +130,11 @@ async function loadParkingSpots() {
     
     try {
         // Get filter values
+        const startDate = document.getElementById('filterStartDate')?.value;
+        const startTime = document.getElementById('filterStartTime')?.value;
+        const endDate = document.getElementById('filterEndDate')?.value;
+        const endTime = document.getElementById('filterEndTime')?.value;
+        
         const filters = {
             city: filterCity?.value || '',
             spot_type: document.getElementById('filterType')?.value || '',
@@ -137,6 +142,14 @@ async function loadParkingSpots() {
             is_covered: document.getElementById('filterCovered')?.checked || undefined,
             limit: 50
         };
+        
+        // Add start_time and end_time if both date and time are provided
+        if (startDate && startTime) {
+            filters.start_time = `${startDate}T${startTime}:00Z`;
+        }
+        if (endDate && endTime) {
+            filters.end_time = `${endDate}T${endTime}:00Z`;
+        }
         
         // Remove undefined values
         Object.keys(filters).forEach(key => 

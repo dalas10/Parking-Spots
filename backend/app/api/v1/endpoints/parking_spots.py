@@ -181,29 +181,39 @@ async def list_parking_spots(
     latitude: Optional[float] = Query(None, ge=-90, le=90),
     longitude: Optional[float] = Query(None, ge=-180, le=180),
     radius_km: float = Query(10.0, gt=0, le=100),
+    city: Optional[str] = None,
     spot_type: Optional[ParkingSpotType] = None,
     vehicle_size: Optional[VehicleSize] = None,
     max_hourly_rate: Optional[int] = Query(None, gt=0),
     has_ev_charging: Optional[bool] = None,
     is_covered: Optional[bool] = None,
+    start_time: Optional[datetime] = None,
+    end_time: Optional[datetime] = None,
+    limit: Optional[int] = Query(None, ge=1, le=100),
     page: int = Query(1, ge=1),
     page_size: int = Query(20, ge=1, le=100),
     db: AsyncSession = Depends(get_db)
 ):
     """List parking spots with optional filters and location-based search."""
+    # Use limit if provided, otherwise use page_size
+    effective_page_size = limit if limit else page_size
+    
     # Generate cache key from query parameters
     cache_key = cache.generate_cache_key(
         "search",
         latitude=latitude,
         longitude=longitude,
         radius_km=radius_km,
+        city=city,
         spot_type=spot_type,
         vehicle_size=vehicle_size,
         max_hourly_rate=max_hourly_rate,
         has_ev_charging=has_ev_charging,
         is_covered=is_covered,
+        start_time=start_time,
+        end_time=end_time,
         page=page,
-        page_size=page_size
+        page_size=effective_page_size
     )
     
     # Try to get from cache
@@ -222,6 +232,8 @@ async def list_parking_spots(
     )
     
     # Apply filters
+    if city:
+        query = query.where(func.lower(ParkingSpot.city) == city.lower())
     if spot_type:
         query = query.where(ParkingSpot.spot_type == spot_type)
     if vehicle_size:
@@ -234,11 +246,35 @@ async def list_parking_spots(
         query = query.where(ParkingSpot.is_covered == is_covered)
     
     # Pagination
-    offset = (page - 1) * page_size
-    query = query.offset(offset).limit(page_size)
+    offset = (page - 1) * effective_page_size
+    query = query.offset(offset).limit(effective_page_size)
     
     result = await db.execute(query)
     spots = result.scalars().all()
+    
+    # Filter by availability if date/time range provided
+    if start_time and end_time:
+        available_spots = []
+        for spot in spots:
+            # Check for conflicting bookings
+            booking_query = select(Booking).where(
+                and_(
+                    Booking.parking_spot_id == spot.id,
+                    Booking.status.in_([BookingStatus.CONFIRMED, BookingStatus.IN_PROGRESS]),
+                    or_(
+                        and_(Booking.start_time <= start_time, Booking.end_time > start_time),
+                        and_(Booking.start_time < end_time, Booking.end_time >= end_time),
+                        and_(Booking.start_time >= start_time, Booking.end_time <= end_time)
+                    )
+                )
+            )
+            booking_result = await db.execute(booking_query)
+            has_conflict = booking_result.scalar_one_or_none() is not None
+            
+            if not has_conflict:
+                available_spots.append(spot)
+        
+        spots = available_spots
     
     # Calculate distance if location provided
     response_spots = []
