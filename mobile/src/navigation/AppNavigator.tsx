@@ -11,9 +11,11 @@ import { LoginScreen, RegisterScreen } from '../screens/auth';
 
 // Main screens
 import { HomeScreen } from '../screens/home/HomeScreen';
+import { SearchScreen } from '../screens/search/SearchScreen';
 import { ParkingSpotDetailScreen } from '../screens/parking/ParkingSpotDetailScreen';
 import { BookingsScreen } from '../screens/bookings/BookingsScreen';
 import { ProfileScreen } from '../screens/profile/ProfileScreen';
+import { Colors } from '../constants/colors';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -31,6 +33,15 @@ const HomeStack = () => (
       name="HomeMain"
       component={HomeScreen}
       options={{ headerShown: false }}
+    />
+    <Stack.Screen
+      name="Search"
+      component={SearchScreen}
+      options={{ 
+        title: 'Search Parking',
+        headerStyle: { backgroundColor: Colors.primary },
+        headerTintColor: '#fff',
+      }}
     />
     <Stack.Screen
       name="ParkingSpotDetail"
@@ -82,7 +93,7 @@ const MainTabs = () => (
           </View>
         );
       },
-      tabBarActiveTintColor: '#4F46E5',
+      tabBarActiveTintColor: Colors.primary,
       tabBarInactiveTintColor: 'gray',
       headerShown: false,
     })}
@@ -120,7 +131,7 @@ export const AppNavigator = () => {
   if (isLoading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#4F46E5" />
+        <ActivityIndicator size="large" color={Colors.primary} />
       </View>
     );
   }

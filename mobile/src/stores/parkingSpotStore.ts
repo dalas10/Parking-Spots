@@ -60,22 +60,28 @@ export const useParkingSpotStore = create<ParkingSpotState>((set, get) => ({
   searchNearby: async (params?: Partial<ParkingSpotSearch>) => {
     const { currentLocation, searchFilters } = get();
     
-    if (!currentLocation && !params?.latitude) {
-      set({ searchError: 'Location is required for search' });
+    // Allow search without location if text search (q) or city is provided
+    const hasTextSearch = params?.q || params?.city;
+    if (!currentLocation && !params?.latitude && !hasTextSearch) {
+      set({ searchError: 'Location or search text is required' });
       return;
     }
     
     set({ isSearching: true, searchError: null });
     
     try {
-      const searchParams: ParkingSpotSearch = {
-        latitude: params?.latitude || currentLocation!.latitude,
-        longitude: params?.longitude || currentLocation!.longitude,
+      const searchParams: Partial<ParkingSpotSearch> = {
         ...searchFilters,
         ...params,
       };
       
-      const results = await parkingSpotService.searchParkingSpots(searchParams);
+      // Add location only if available
+      if (currentLocation && !params?.latitude) {
+        searchParams.latitude = currentLocation.latitude;
+        searchParams.longitude = currentLocation.longitude;
+      }
+      
+      const results = await parkingSpotService.searchParkingSpots(searchParams as ParkingSpotSearch);
       set({ searchResults: results, isSearching: false });
     } catch (error: any) {
       const message = error.response?.data?.detail || 'Search failed';

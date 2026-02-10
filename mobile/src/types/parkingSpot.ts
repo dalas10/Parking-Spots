@@ -79,15 +79,24 @@ export interface ParkingSpotCreate {
 }
 
 export interface ParkingSpotSearch {
-  latitude: number;
-  longitude: number;
+  // Text search (searches title, address, city, zip)
+  q?: string;
+  // Location-based search
+  latitude?: number;
+  longitude?: number;
   radius_km?: number;
+  // Filters
+  city?: string;
   spot_type?: ParkingSpotType;
   vehicle_size?: VehicleSize;
   max_hourly_rate?: number;
   has_ev_charging?: boolean;
   is_covered?: boolean;
   is_handicap_accessible?: boolean;
+  // Date/time availability filtering
+  start_time?: string; // ISO 8601 format
+  end_time?: string;   // ISO 8601 format
+  // Pagination
   page?: number;
   page_size?: number;
 }

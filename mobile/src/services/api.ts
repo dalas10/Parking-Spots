@@ -2,7 +2,7 @@ import axios, { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const API_URL = __DEV__ 
-  ? 'http://localhost:8000/api/v1' 
+  ? 'http://192.168.53.100:8000/api/v1' 
   : 'https://api.parkingspots.com/api/v1';
 
 const STORAGE_KEYS = {

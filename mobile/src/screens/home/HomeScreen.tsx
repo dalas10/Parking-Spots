@@ -12,6 +12,7 @@ import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { useParkingSpotStore } from '../../stores';
 import { ParkingSpotListItem } from '../../types';
+import { Colors } from '../../constants/colors';
 
 const { width, height } = Dimensions.get('window');
 
@@ -129,7 +130,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             title={spot.title}
             description={`${formatPrice(spot.hourly_rate)}/hr`}
             onPress={() => handleMarkerPress(spot)}
-            pinColor={selectedSpotId === spot.id ? '#4F46E5' : '#EF4444'}
+            pinColor={selectedSpotId === spot.id ? Colors.primary : Colors.error}
           />
         ))}
       </MapView>
@@ -157,7 +158,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       {/* Results list */}
       {isSearching ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#4F46E5" />
+          <ActivityIndicator size="large" color={Colors.primary} />
         </View>
       ) : (
         <View style={[styles.listContainer, showList && styles.listContainerExpanded]}>
@@ -216,7 +217,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 130,
     right: 16,
-    backgroundColor: '#4F46E5',
+    backgroundColor: Colors.primary,
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
@@ -263,7 +264,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   spotCardSelected: {
-    borderColor: '#4F46E5',
+    borderColor: Colors.primary,
     borderWidth: 2,
   },
   spotCardContent: {},
@@ -286,7 +287,7 @@ const styles = StyleSheet.create({
   spotPrice: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#4F46E5',
+    color: Colors.primary,
   },
   ratingContainer: {
     flexDirection: 'row',
