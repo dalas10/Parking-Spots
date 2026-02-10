@@ -1,4 +1,7 @@
 # ParkingSpots Platform
+
+![ParkingSpots Logo](urbee.jpg)
+
 ## Software Development Proposal & Agreement
 
 ---
@@ -8,6 +11,8 @@
 **Date:** February 10, 2026  
 **Proposal Valid Until:** March 10, 2026  
 **Document Version:** 2.0 - Production Ready
+
+**Brand Colors**: 🟠 #fdb82e (Primary) | ⚫ #2c3e50 (Text) | 🟢 #27ae60 (Success)
 
 **Status**: ✅ Fully deployed and performance-tested in production
 

@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ParkingSpots - Brand Demo</title>
+    <link rel="stylesheet" href="assets/brand-colors.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--font-family);
+            color: var(--text-primary);
+            background: linear-gradient(135deg, #ecf0f1 0%, #ffffff 100%);
+            padding: var(--space-2xl);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: var(--space-2xl);
+        }
+        
+        .logo-container {
+            margin-bottom: var(--space-lg);
+        }
+        
+        .logo {
+            max-width: 200px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-brand);
+        }
+        
+        h1 {
+            font-size: var(--font-size-4xl);
+            font-weight: var(--font-weight-bold);
+            background: var(--brand-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: var(--space-sm);
+        }
+        
+        .tagline {
+            font-size: var(--font-size-xl);
+            color: var(--text-secondary);
+            font-weight: var(--font-weight-medium);
+        }
+        
+        .section {
+            background: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-xl);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .section-title {
+            font-size: var(--font-size-2xl);
+            font-weight: var(--font-weight-bold);
+            color: var(--brand-primary);
+            margin-bottom: var(--space-lg);
+        }
+        
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-md);
+            margin-bottom: var(--space-lg);
+        }
+        
+        .color-box {
+            text-align: center;
+            padding: var(--space-lg);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition-base);
+        }
+        
+        .color-box:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .color-swatch {
+            width: 100%;
+            height: 80px;
+            border-radius: var(--radius-md);
+            margin-bottom: var(--space-sm);
+        }
+        
+        .color-name {
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--space-xs);
+        }
+        
+        .color-code {
+            font-family: var(--font-family-mono);
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+        }
+        
+        .button-grid {
+            display: flex;
+            gap: var(--space-md);
+            flex-wrap: wrap;
+            margin-bottom: var(--space-lg);
+        }
+        
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: var(--space-lg);
+        }
+        
+        .demo-card {
+            padding: var(--space-lg);
+        }
+        
+        .demo-card h3 {
+            color: var(--brand-primary);
+            margin-bottom: var(--space-sm);
+            font-size: var(--font-size-xl);
+        }
+        
+        .demo-card p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        
+        .badge-grid {
+            display: flex;
+            gap: var(--space-sm);
+            flex-wrap: wrap;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-lg);
+            margin-top: var(--space-xl);
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: var(--space-lg);
+            background: var(--brand-gradient);
+            color: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-brand);
+        }
+        
+        .stat-number {
+            font-size: var(--font-size-4xl);
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--space-xs);
+        }
+        
+        .stat-label {
+            font-size: var(--font-size-base);
+            opacity: 0.9;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: var(--space-2xl);
+            padding-top: var(--space-xl);
+            border-top: 1px solid var(--border-light);
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-container">
+                <img src="assets/logo.jpg" alt="ParkingSpots Logo" class="logo">
+            </div>
+            <h1>ParkingSpots</h1>
+            <p class="tagline">Find Your Perfect Parking Space</p>
+        </header>
+        
+        <!-- Brand Colors Section -->
+        <section class="section">
+            <h2 class="section-title">🎨 Brand Colors</h2>
+            <div class="color-grid">
+                <div class="color-box">
+                    <div class="color-swatch" style="background: #fdb82e;"></div>
+                    <div class="color-name">Urbee Gold</div>
+                    <div class="color-code">#fdb82e</div>
+                </div>
+                <div class="color-box">
+                    <div class="color-swatch" style="background: #fdba2e;"></div>
+                    <div class="color-name">Golden Hour</div>
+                    <div class="color-code">#fdba2e</div>
+                </div>
+                <div class="color-box">
+                    <div class="color-swatch" style="background: #fe9f1d;"></div>
+                    <div class="color-name">Sunset Orange</div>
+                    <div class="color-code">#fe9f1d</div>
+                </div>
+                <div class="color-box">
+                    <div class="color-swatch" style="background: #fec538;"></div>
+                    <div class="color-name">Morning Glow</div>
+                    <div class="color-code">#fec538</div>
+                </div>
+            </div>
+            
+            <h3 style="margin-bottom: var(--space-md); color: var(--text-primary);">Semantic Colors</h3>
+            <div class="color-grid">
+                <div class="color-box">
+                    <div class="color-swatch" style="background: #27ae60;"></div>
+                    <div class="color-name">Success</div>
+                    <div class="color-code">#27ae60</div>
+                </div>
+                <div class="color-box">
+                    <div class="color-swatch" style="background: #e74c3c;"></div>
+                    <div class="color-name">Error</div>
+                    <div class="color-code">#e74c3c</div>
+                </div>
+                <div class="color-box">
+                    <div class="color-swatch" style="background: #f39c12;"></div>
+                    <div class="color-name">Warning</div>
+                    <div class="color-code">#f39c12</div>
+                </div>
+                <div class="color-box">
+                    <div class="color-swatch" style="background: #3498db;"></div>
+                    <div class="color-name">Info</div>
+                    <div class="color-code">#3498db</div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Buttons Section -->
+        <section class="section">
+            <h2 class="section-title">🔘 Buttons</h2>
+            <div class="button-grid">
+                <button class="btn btn-primary">Primary Button</button>
+                <button class="btn btn-secondary">Secondary Button</button>
+                <button class="btn btn-primary btn-large">Large Button</button>
+            </div>
+        </section>
+        
+        <!-- Badges Section -->
+        <section class="section">
+            <h2 class="section-title">🏷️ Badges</h2>
+            <div class="badge-grid">
+                <span class="badge badge-primary">Available</span>
+                <span class="badge badge-success">Confirmed</span>
+                <span class="badge badge-error">Unavailable</span>
+                <span class="badge" style="background: #3498db; color: white;">Premium</span>
+            </div>
+        </section>
+        
+        <!-- Cards Section -->
+        <section class="section">
+            <h2 class="section-title">🗂️ Cards</h2>
+            <div class="cards-grid">
+                <div class="card demo-card">
+                    <h3>Downtown Plaza</h3>
+                    <p>Premium parking spot in the heart of the city. Perfect for business meetings and shopping.</p>
+                    <div style="margin-top: var(--space-md);">
+                        <span class="badge badge-success">Available</span>
+                    </div>
+                </div>
+                <div class="card card-highlighted demo-card">
+                    <h3>Featured Spot</h3>
+                    <p>VIP parking with 24/7 security and covered space. Most popular choice for daily commuters.</p>
+                    <div style="margin-top: var(--space-md);">
+                        <span class="badge badge-primary">Premium</span>
+                    </div>
+                </div>
+                <div class="card demo-card">
+                    <h3>Airport Terminal</h3>
+                    <p>Long-term parking near the main terminal. Ideal for travelers and tourists.</p>
+                    <div style="margin-top: var(--space-md);">
+                        <span class="badge badge-success">Available</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Performance Stats -->
+        <section class="section">
+            <h2 class="section-title">📊 Production Performance</h2>
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number">1,666</div>
+                    <div class="stat-label">Requests/Second</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">&lt;1ms</div>
+                    <div class="stat-label">Response Time</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">95%</div>
+                    <div class="stat-label">Cache Hit Rate</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">12</div>
+                    <div class="stat-label">API Workers</div>
+                </div>
+            </div>
+        </section>
+        
+        <footer>
+            <p>ParkingSpots &copy; 2024 | Brand Color: <span class="text-brand">#fdb82e (Urbee Gold)</span></p>
+        </footer>
+    </div>
+</body>
+</html>

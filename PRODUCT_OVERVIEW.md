@@ -1,11 +1,17 @@
 # ParkingSpots Platform
+
+<div align="center">
+  <img src="urbee.jpg" alt="ParkingSpots Logo" width="200" />
+</div>
+
 ## Product Overview & User Guide
 
 ---
 
 **Prepared For:** [Client Name]  
 **Date:** February 10, 2026  
-**Version:** 2.0 - Production Ready
+**Version:** 2.0 - Production Ready  
+**Brand Identity**: Urbee Gold (#fdb82e) - Vibrant, trustworthy, modern
 
 **Status**: ✅ Deployed with 1,666+ RPS, 95% cache hit rate, <1ms response time
 

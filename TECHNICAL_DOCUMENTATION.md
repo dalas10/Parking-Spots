@@ -1,8 +1,11 @@
 # ParkingSpots - Technical Documentation
 
+![ParkingSpots](urbee.jpg)
+
 **Version:** 2.0.0 - Production Ready  
 **Date:** February 10, 2026  
-**Author:** Development Team
+**Author:** Development Team  
+**Brand Assets**: Logo: `urbee.jpg` | Primary Color: #fdb82e
 
 **Deployment Status:** ✅ Live in Production (1,666+ RPS, 95% cache hit, <1ms response)
 
