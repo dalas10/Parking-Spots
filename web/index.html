@@ -19,7 +19,7 @@
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-brand">
-                <img src="assets/logo.jpg" alt="Urbee" style="height: 32px; vertical-align: middle; border-radius: 4px; margin-right: 8px;">
+                <img src="assets/logo.jpg" alt="Urbee" style="height: 48px; vertical-align: middle; border-radius: 4px; margin-right: 12px;">
                 <span>Urbee</span>
             </div>
         </div>
@@ -49,14 +49,16 @@
                 <button class="toggle-btn" id="btnListView" onclick="switchView('list')" data-i18n="views.list_view">📋 List View</button>
             </div>
 
-            <h2 data-i18n="spot.title">Available Parking Spots</h2>
+            <h2 data-i18n="spot.title" style="text-align: center;">Available Parking Spots</h2>
             <div class="filters">
-                <input type="date" id="filterStartDate" onchange="applyFilters()" placeholder="Start Date" title="Start Date">
-                <input type="time" id="filterStartTime" onchange="applyFilters()" placeholder="Start Time" title="Start Time">
-                <label style="display: flex; align-items: center; gap: 0.3rem;">
-                    <input type="number" id="filterDuration" min="1" max="24" step="1" placeholder="Duration" onchange="applyFilters()" style="width: 90px;" title="Duration in hours">
-                    <span style="color: var(--text-light); font-size: 0.9rem;">hours</span>
-                </label>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap; width: 100%; margin-bottom: 0.5rem; justify-content: center;">
+                    <input type="date" id="filterStartDate" onchange="applyFilters()" placeholder="Start Date" title="Start Date">
+                    <input type="time" id="filterStartTime" onchange="applyFilters()" placeholder="Start Time" title="Start Time">
+                    <label style="display: flex; align-items: center; gap: 0.3rem;">
+                        <input type="number" id="filterDuration" min="1" max="24" step="1" placeholder="Duration" onchange="applyFilters()" style="width: 90px;" title="Duration in hours">
+                        <span style="color: var(--text-light); font-size: 0.9rem;">hours</span>
+                    </label>
+                </div>
                 <select id="filterCity" onchange="applyFilters()">
                     <option value="" data-i18n="filters.all_cities">All Cities</option>
                 </select>
