@@ -64,7 +64,7 @@ function createBookingCard(booking) {
         <div class="booking-details">
             <h3>${booking.parking_spot?.title || 'Parking Spot'}</h3>
             <div class="booking-meta">
-                📍 ${booking.parking_spot?.city || 'N/A'}, ${booking.parking_spot?.state || ''}
+                📍 ${booking.parking_spot?.address || `${booking.parking_spot?.city || ''}, ${booking.parking_spot?.state || ''}`.trim() || 'Location unavailable'}
             </div>
             <div class="booking-meta">
                 📅 ${formatDate(booking.start_time)} - ${formatDate(booking.end_time)}
