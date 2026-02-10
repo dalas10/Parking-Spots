@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>i18n Test - ParkingSpots</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="i18n.js"></script>
+    <style>
+        .test-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 2rem 0;
+            padding: 1rem;
+            background: #f9fafb;
+            border-left: 4px solid #3b82f6;
+        }
+        .test-label {
+            font-weight: bold;
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        .test-result {
+            font-size: 1.1rem;
+            color: #1f2937;
+        }
+        .lang-info {
+            background: #dbeafe;
+            padding: 1rem;
+            border-radius: 5px;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">🅿️ ParkingSpots - i18n Test</div>
+            <div class="nav-links">
+                <a href="index.html" data-i18n="nav.home">Home</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="test-container">
+        <h1>🌍 Internationalization Test Page</h1>
+        <p>This page demonstrates the multi-language functionality of ParkingSpots.</p>
+
+        <div class="lang-info">
+            <strong>Current Language:</strong> <span id="currentLang"></span><br>
+            <strong>Available Languages:</strong> English (en), Greek (el)
+        </div>
+
+        <h2>Static Translations</h2>
+        <p>These texts use <code>data-i18n</code> attributes and update automatically:</p>
+
+        <div class="test-section">
+            <div class="test-label">Navigation - Home:</div>
+            <div class="test-result" data-i18n="nav.home">Home</div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-label">Navigation - My Bookings:</div>
+            <div class="test-result" data-i18n="nav.bookings">My Bookings</div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-label">Hero Title:</div>
+            <div class="test-result" data-i18n="hero.title">Find Your Perfect Parking Spot</div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-label">Search Button:</div>
+            <div class="test-result" data-i18n="hero.search_button">Search</div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-label">Auth - Welcome Back:</div>
+            <div class="test-result" data-i18n="auth.welcome_back">Welcome Back</div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-label">Spot - Per Hour:</div>
+            <div class="test-result" data-i18n="spot.per_hour">/hr</div>
+        </div>
+
+        <h2>Dynamic Translations</h2>
+        <p>These texts use JavaScript <code>t()</code> function:</p>
+
+        <div class="test-section">
+            <div class="test-label">Profile - Total Bookings (JavaScript):</div>
+            <div class="test-result" id="dynamicTest1">Loading...</div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-label">Filters - All Cities (JavaScript):</div>
+            <div class="test-result" id="dynamicTest2">Loading...</div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-label">Messages - Login Failed (JavaScript):</div>
+            <div class="test-result" id="dynamicTest3">Loading...</div>
+        </div>
+
+        <h2>Test Instructions</h2>
+        <ol>
+            <li>Look for the language selector in the navigation bar (top right)</li>
+            <li>Select "🇬🇷 Ελληνικά" to switch to Greek</li>
+            <li>Watch all text above update automatically</li>
+            <li>Select "🇬🇧 English" to switch back</li>
+            <li>Reload the page - your language preference should persist</li>
+        </ol>
+
+        <div class="lang-info">
+            <strong>✅ Success Criteria:</strong><br>
+            - Language selector appears in navigation bar<br>
+            - All static texts update when language changes<br>
+            - All dynamic texts update when language changes<br>
+            - Language preference persists after page reload<br>
+            - No console errors appear
+        </div>
+
+        <div style="text-align: center; margin-top: 2rem;">
+            <a href="index.html" class="btn-primary">← Back to Home</a>
+        </div>
+    </div>
+
+    <script>
+        // Update current language display
+        function updateLanguageDisplay() {
+            const langMap = { 'en': '🇬🇧 English', 'el': '🇬🇷 Ελληνικά (Greek)' };
+            document.getElementById('currentLang').textContent = langMap[getCurrentLanguage()] || getCurrentLanguage();
+            
+            // Update dynamic test content
+            document.getElementById('dynamicTest1').textContent = t('profile.total_bookings');
+            document.getElementById('dynamicTest2').textContent = t('filters.all_cities');
+            document.getElementById('dynamicTest3').textContent = t('messages.login_failed');
+        }
+
+        // Listen for language changes
+        document.addEventListener('languageChanged', updateLanguageDisplay);
+        
+        // Initial update
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(updateLanguageDisplay, 100);
+        });
+    </script>
+</body>
+</html>

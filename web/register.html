@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#4CAF50">
+    <link rel="manifest" href="/manifest.json">
+    <title>Register - ParkingSpots</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="i18n.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">🅿️ ParkingSpots</div>
+            <div class="nav-links">
+                <a href="index.html" data-i18n="nav.home">Home</a>
+                <a href="login.html" data-i18n="nav.login">Login</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="auth-container">
+        <div class="auth-box">
+            <h1 data-i18n="auth.create_account">Create Account</h1>
+            <p class="subtitle" data-i18n="auth.join">Join ParkingSpots today</p>
+
+            <div id="googleSignUpSection">
+                <div id="googleSignUpButton" class="google-signin-button"></div>
+                
+                <div class="divider">
+                    <span data-i18n="auth.or">OR</span>
+                </div>
+            </div>
+
+            <div id="errorMessage" class="error-message" style="display: none;"></div>
+            <div id="successMessage" class="success-message" style="display: none;"></div>
+
+            <form id="registerForm" onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label for="fullName" data-i18n="auth.full_name">Full Name</label>
+                    <input type="text" id="fullName" required placeholder="John Doe">
+                </div>
+
+                <div class="form-group">
+                    <label for="email" data-i18n="auth.email">Email</label>
+                    <input type="email" id="email" required placeholder="your@email.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="phone" data-i18n="auth.phone">Phone Number</label>
+                    <input type="tel" id="phone" required placeholder="+1234567890">
+                </div>
+
+                <div class="form-group">
+                    <label for="password" data-i18n="auth.password">Password</label>
+                    <input type="password" id="password" required placeholder="••••••••" minlength="8">
+                    <small data-i18n="auth.password_hint">Must be at least 8 characters</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword" data-i18n="auth.confirm_password">Confirm Password</label>
+                    <input type="password" id="confirmPassword" required placeholder="••••••••">
+                </div>
+
+                <div class="form-group">
+                    <label data-i18n="auth.role_question">I want to:</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="role" value="renter" checked>
+                            <span data-i18n="auth.role_renter">Rent parking spots</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="role" value="owner">
+                            <span data-i18n="auth.role_owner">List my parking spots</span>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-primary btn-full" id="btnRegister" data-i18n="auth.create_button">
+                    Create Account
+                </button>
+            </form>
+
+            <div class="auth-footer">
+                <p><span data-i18n="auth.have_account">Already have an account?</span> <a href="login.html" data-i18n="auth.sign_in_link">Sign in</a></p>
+            </div>
+        </div>
+    </main>
+
+    <script src="auth.js"></script>
+    <script src="api.js"></script>
+    <script>
+        // Initialize Google Sign-Up
+        window.onload = function() {
+            // REPLACE WITH YOUR ACTUAL GOOGLE CLIENT ID:
+            const GOOGLE_CLIENT_ID = '817225085142-qso89cpagfu6fkipnpbve4keaqo7h8n0.apps.googleusercontent.com';
+            
+            google.accounts.id.initialize({
+                client_id: GOOGLE_CLIENT_ID,
+                callback: handleGoogleResponse,
+                auto_select: false
+            });
+            
+            google.accounts.id.renderButton(
+                document.getElementById('googleSignUpButton'),
+                { 
+                    theme: 'outline', 
+                    size: 'large',
+                    width: '100%',
+                    text: 'signup_with',
+                    logo_alignment: 'left'
+                }
+            );
+        };
+
+        async function handleGoogleResponse(response) {
+            const errorMessage = document.getElementById('errorMessage');
+            const successMessage = document.getElementById('successMessage');
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+            
+            // Get selected role from form
+            const role = document.querySelector('input[name="role"]:checked')?.value || 'renter';
+            
+            try {
+                const result = await fetch(`${API_BASE_URL}/api/v1/oauth/google`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        token: response.credential,
+                        role: role
+                    })
+                });
+                
+                if (!result.ok) {
+                    const error = await result.json();
+                    throw new Error(error.detail || 'Google sign-up failed');
+                }
+                
+                const data = await result.json();
+                
+                // Save tokens (use 'token' key to match regular login)
+                localStorage.setItem('token', data.access_token);
+                localStorage.setItem('token_type', data.token_type || 'bearer');
+                localStorage.setItem('user', JSON.stringify(data.user));
+                
+                // Show success and redirect
+                successMessage.textContent = window.t ? t('messages.account_created') : 'Account created successfully! Redirecting...';
+                successMessage.style.display = 'block';
+                
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1500);
+            } catch (error) {
+                console.error('Google sign-up error:', error);
+                errorMessage.textContent = error.message;
+                errorMessage.style.display = 'block';
+            }
+        }
+
+    </script>
+    <script>
+        async function handleRegister(e) {
+            e.preventDefault();
+            
+            const fullName = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const role = document.querySelector('input[name="role"]:checked').value;
+            
+            const btnRegister = document.getElementById('btnRegister');
+            const errorMessage = document.getElementById('errorMessage');
+            const successMessage = document.getElementById('successMessage');
+            
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+            
+            // Validate passwords match
+            if (password !== confirmPassword) {
+                errorMessage.textContent = window.t ? t('messages.passwords_no_match') : 'Passwords do not match';
+                errorMessage.style.display = 'block';
+                return;
+            }
+            
+            btnRegister.disabled = true;
+            btnRegister.textContent = window.t ? t('auth.creating') : 'Creating account...';
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/v1/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password,
+                        full_name: fullName,
+                        phone_number: phone,
+                        role: role
+                    })
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || (window.t ? t('messages.registration_failed') : 'Registration failed'));
+                }
+                
+                const data = await response.json();
+                
+                successMessage.textContent = window.t ? t('messages.account_created') : 'Account created successfully! Redirecting to login...';
+                successMessage.style.display = 'block';
+                
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 2000);
+                
+            } catch (error) {
+                errorMessage.textContent = error.message;
+                errorMessage.style.display = 'block';
+                btnRegister.disabled = false;
+                btnRegister.textContent = window.t ? t('auth.create_button') : 'Create Account';
+            }
+        }
+    </script>
+    <script src="pwa.js"></script>
+</body>
+</html>

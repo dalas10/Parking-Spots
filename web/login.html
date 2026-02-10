@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#4CAF50">
+    <link rel="manifest" href="/manifest.json">
+    <title>Login - ParkingSpots</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="i18n.js"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">🅿️ ParkingSpots</div>
+            <div class="nav-links">
+                <a href="index.html" data-i18n="nav.home">Home</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="auth-container">
+        <div class="auth-box">
+            <h1 data-i18n="auth.welcome_back">Welcome Back</h1>
+            <p class="subtitle" data-i18n="auth.sign_in">Sign in to your account</p>
+
+            <div id="errorMessage" class="error-message" style="display: none;"></div>
+
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="email" data-i18n="auth.email">Email</label>
+                    <input type="email" id="email" required placeholder="your@email.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="password" data-i18n="auth.password">Password</label>
+                    <input type="password" id="password" required placeholder="••••••••">
+                </div>
+
+                <button type="submit" class="btn-primary btn-full" id="btnLogin" data-i18n="auth.sign_in_button">
+                    Sign In
+                </button>
+            </form>
+
+            <div class="divider">
+                <span data-i18n="auth.or">OR</span>
+            </div>
+
+            <div id="googleSignInButton" class="google-signin-button"></div>
+
+            <div class="auth-footer">
+                <p><span data-i18n="auth.no_account">Don't have an account?</span> <a href="register.html" data-i18n="auth.sign_up">Sign up</a></p>
+            </div>
+
+            <div class="demo-credentials">
+                <p><strong data-i18n="auth.demo_accounts">Demo Accounts:</strong></p>
+                <p><span data-i18n="auth.renter">Renter</span>: renter1@parkingspots.com / Renter123!</p>
+                <p><span data-i18n="auth.owner">Owner</span>: owner1@parkingspots.com / Owner123!</p>
+            </div>
+        </div>
+    </main>
+
+    <script src="auth.js"></script>
+    <script src="api.js"></script>
+    <script>
+        // Initialize Google Sign-In
+        window.onload = function() {
+            // REPLACE WITH YOUR ACTUAL GOOGLE CLIENT ID:
+            const GOOGLE_CLIENT_ID = '817225085142-qso89cpagfu6fkipnpbve4keaqo7h8n0.apps.googleusercontent.com';
+            
+            google.accounts.id.initialize({
+                client_id: GOOGLE_CLIENT_ID,
+                callback: handleGoogleResponse,
+                auto_select: false
+            });
+            
+            google.accounts.id.renderButton(
+                document.getElementById('googleSignInButton'),
+                { 
+                    theme: 'outline', 
+                    size: 'large',
+                    width: '100%',
+                    text: 'signin_with',
+                    logo_alignment: 'left'
+                }
+            );
+        };
+
+        async function handleGoogleResponse(response) {
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.style.display = 'none';
+            
+            try {
+                const result = await fetch(`${API_BASE_URL}/api/v1/oauth/google`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        token: response.credential,
+                        role: 'renter'
+                    })
+                });
+                
+                if (!result.ok) {
+                    const error = await result.json();
+                    throw new Error(error.detail || 'Google sign-in failed');
+                }
+                
+                const data = await result.json();
+                
+                // Save tokens (use 'token' key to match regular login)
+                localStorage.setItem('token', data.access_token);
+                localStorage.setItem('token_type', data.token_type || 'bearer');
+                localStorage.setItem('user', JSON.stringify(data.user));
+                
+                // Redirect to home
+                window.location.href = 'index.html';
+            } catch (error) {
+                console.error('Google sign-in error:', error);
+                errorMessage.textContent = error.message;
+                errorMessage.style.display = 'block';
+            }
+        }
+
+    </script>
+    <script>
+        async function handleLogin(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const btnLogin = document.getElementById('btnLogin');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            errorMessage.style.display = 'none';
+            btnLogin.disabled = true;
+            btnLogin.textContent = window.t ? t('auth.signing_in') : 'Signing in...';
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password
+                    })
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Login failed');
+                }
+                
+                const data = await response.json();
+                
+                // Save auth data
+                localStorage.setItem('token', data.access_token);
+                localStorage.setItem('token_type', data.token_type);
+                
+                // Get user info
+                const userResponse = await fetch(`${API_BASE_URL}/api/v1/users/me`, {
+                    headers: {
+                        'Authorization': `Bearer ${data.access_token}`
+                    }
+                });
+                
+                if (userResponse.ok) {
+                    const user = await userResponse.json();
+                    localStorage.setItem('user', JSON.stringify(user));
+                }
+                
+                // Redirect to home
+                window.location.href = 'index.html';
+                
+            } catch (error) {
+                errorMessage.textContent = error.message;
+                errorMessage.style.display = 'block';
+                btnLogin.disabled = false;
+                btnLogin.textContent = 'Sign In';
+            }
+        }
+        
+        // Redirect if already logged in
+        if (isAuthenticated()) {
+            window.location.href = 'index.html';
+        }
+    </script>
+    <script src="pwa.js"></script>
+</body>
+</html>
