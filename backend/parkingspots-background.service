@@ -1,0 +1,24 @@
+[Unit]
+Description=ParkingSpots Background Tasks Worker
+After=network.target postgresql.service redis.service
+Requires=postgresql.service redis.service
+
+[Service]
+Type=simple
+User=dalas
+Group=dalas
+WorkingDirectory=/home/dalas/ParkingSpots/backend
+Environment="DATABASE_URL=postgresql+asyncpg://parking_user:parking_secure_2026@localhost:5432/parkingspots"
+ExecStart=/home/dalas/ParkingSpots/backend/venv/bin/python /home/dalas/ParkingSpots/backend/run_background_tasks.py
+Restart=always
+RestartSec=10
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/dalas/ParkingSpots/backend
+
+[Install]
+WantedBy=multi-user.target

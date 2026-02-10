@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, and_, or_
 from math import radians, cos, sin, asin, sqrt
+import json
 
 from app.db.session import get_db
 from app.models.user import User, UserRole
@@ -15,6 +16,7 @@ from app.schemas.parking_spot import (
     AvailabilitySlotResponse
 )
 from app.api.deps import get_current_user, get_current_owner
+from app.cache import cache, invalidate_spot_cache, invalidate_search_cache
 
 router = APIRouter()
 
@@ -189,6 +191,29 @@ async def list_parking_spots(
     db: AsyncSession = Depends(get_db)
 ):
     """List parking spots with optional filters and location-based search."""
+    # Generate cache key from query parameters
+    cache_key = cache.generate_cache_key(
+        "search",
+        latitude=latitude,
+        longitude=longitude,
+        radius_km=radius_km,
+        spot_type=spot_type,
+        vehicle_size=vehicle_size,
+        max_hourly_rate=max_hourly_rate,
+        has_ev_charging=has_ev_charging,
+        is_covered=is_covered,
+        page=page,
+        page_size=page_size
+    )
+    
+    # Try to get from cache
+    cached_result = await cache.get(cache_key)
+    if cached_result:
+        try:
+            return json.loads(cached_result)
+        except json.JSONDecodeError:
+            pass
+    
     query = select(ParkingSpot).where(
         and_(
             ParkingSpot.is_active == True,
@@ -247,6 +272,12 @@ async def list_parking_spots(
     if latitude and longitude:
         response_spots.sort(key=lambda x: x["distance_km"] or float('inf'))
     
+    # Cache the results for 5 minutes (300 seconds)
+    try:
+        await cache.set(cache_key, json.dumps(response_spots, default=str), ttl=300)
+    except Exception as e:
+        print(f"Cache set error: {e}")
+    
     return response_spots
 
 @router.get("/my-spots", response_model=List[ParkingSpotResponse])
@@ -264,6 +295,15 @@ async def get_my_parking_spots(
 @router.get("/{spot_id}", response_model=ParkingSpotResponse)
 async def get_parking_spot(spot_id: str, db: AsyncSession = Depends(get_db)):
     """Get parking spot by ID."""
+    # Try to get from cache
+    cache_key = f"spot:{spot_id}"
+    cached_spot = await cache.get(cache_key)
+    if cached_spot:
+        try:
+            return json.loads(cached_spot)
+        except json.JSONDecodeError:
+            pass
+    
     result = await db.execute(select(ParkingSpot).where(ParkingSpot.id == spot_id))
     spot = result.scalar_one_or_none()
     
@@ -272,6 +312,45 @@ async def get_parking_spot(spot_id: str, db: AsyncSession = Depends(get_db)):
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Parking spot not found"
         )
+    
+    # Cache the spot details for 10 minutes (600 seconds)
+    try:
+        spot_dict = {
+            "id": str(spot.id),
+            "owner_id": str(spot.owner_id),
+            "title": spot.title,
+            "description": spot.description,
+            "spot_type": spot.spot_type,
+            "vehicle_size": spot.vehicle_size,
+            "address": spot.address,
+            "city": spot.city,
+            "state": spot.state,
+            "zip_code": spot.zip_code,
+            "country": spot.country,
+            "latitude": spot.latitude,
+            "longitude": spot.longitude,
+            "hourly_rate": spot.hourly_rate,
+            "daily_rate": spot.daily_rate,
+            "monthly_rate": spot.monthly_rate,
+            "is_covered": spot.is_covered,
+            "has_ev_charging": spot.has_ev_charging,
+            "has_security": spot.has_security,
+            "has_lighting": spot.has_lighting,
+            "is_handicap_accessible": spot.is_handicap_accessible,
+            "images": spot.images or [],
+            "is_active": spot.is_active,
+            "is_available": spot.is_available,
+            "operating_hours": spot.operating_hours,
+            "access_instructions": spot.access_instructions,
+            "total_bookings": spot.total_bookings,
+            "average_rating": spot.average_rating,
+            "total_reviews": spot.total_reviews,
+            "created_at": spot.created_at.isoformat() if spot.created_at else None,
+            "updated_at": spot.updated_at.isoformat() if spot.updated_at else None
+        }
+        await cache.set(cache_key, json.dumps(spot_dict), ttl=600)
+    except Exception as e:
+        print(f"Cache set error: {e}")
     
     return spot
 
@@ -305,6 +384,9 @@ async def update_parking_spot(
     await db.commit()
     await db.refresh(spot)
     
+    # Invalidate cache for this spot and search results
+    await invalidate_spot_cache(spot_id)
+    
     return spot
 
 @router.delete("/{spot_id}")
@@ -331,6 +413,9 @@ async def delete_parking_spot(
     
     await db.delete(spot)
     await db.commit()
+    
+    # Invalidate cache for this spot and search results
+    await invalidate_spot_cache(spot_id)
     
     return {"message": "Parking spot deleted successfully"}
 

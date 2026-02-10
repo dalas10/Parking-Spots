@@ -8,6 +8,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.session import AsyncSessionLocal
 from app.models.booking import Booking, BookingStatus
 from app.models.parking_spot import ParkingSpot
+from app.models.user import User  # Import User to resolve SQLAlchemy mapper relationships
+from app.models.review import Review  # Import Review to resolve all relationships
 
 logger = logging.getLogger(__name__)
 

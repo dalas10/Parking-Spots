@@ -14,6 +14,7 @@ from app.schemas.booking import (
 )
 from app.api.deps import get_current_user
 from app.core.config import settings
+from app.cache import invalidate_spot_cache, invalidate_search_cache
 
 router = APIRouter()
 
@@ -110,7 +111,9 @@ async def create_booking(
             detail="Cannot book in the past"
         )
     
-    # Check for conflicting bookings
+    # Check for conflicting bookings with row-level lock to prevent race conditions
+    # The with_for_update() ensures no other transaction can read/modify these rows
+    # until this transaction commits, preventing double bookings
     result = await db.execute(
         select(Booking).where(
             and_(
@@ -131,7 +134,7 @@ async def create_booking(
                     )
                 )
             )
-        )
+        ).with_for_update()  # Lock rows to prevent race conditions
     )
     conflicting = result.scalar_one_or_none()
     
@@ -180,6 +183,9 @@ async def create_booking(
     db.add(booking)
     await db.commit()
     await db.refresh(booking)
+    
+    # Invalidate cache since booking affects availability
+    await invalidate_spot_cache(str(booking_in.parking_spot_id))
     
     return booking
 

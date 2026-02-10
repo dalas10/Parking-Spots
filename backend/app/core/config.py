@@ -38,7 +38,10 @@ class Settings(BaseSettings):
     GOOGLE_CLIENT_SECRET: str = ""
     GOOGLE_REDIRECT_URI: str = "http://localhost:3000/auth/google/callback"
     
-    # Redis (for real-time features)
+    # Redis (for caching and real-time features)
+    REDIS_HOST: str = "localhost"
+    REDIS_PORT: int = 6379
+    REDIS_PASSWORD: str = ""
     REDIS_URL: str = "redis://localhost:6379"
     
     # AWS S3 (for image uploads)

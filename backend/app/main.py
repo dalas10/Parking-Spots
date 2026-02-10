@@ -2,15 +2,20 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import asyncio
+import os
 
 from app.core.config import settings
 from app.api.v1.router import api_router
 from app.db.session import engine
 from app.db.base import Base
 from app.background_tasks import background_tasks_runner
+from app.cache import cache
 
 # Global task reference
 background_task = None
+
+# Check if background tasks should run (disabled in multi-worker mode)
+ENABLE_BACKGROUND_TASKS = os.getenv("ENABLE_BACKGROUND_TASKS", "true").lower() == "true"
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -20,8 +25,15 @@ async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     
-    # Start background tasks
-    background_task = asyncio.create_task(background_tasks_runner())
+    # Connect to Redis
+    await cache.connect()
+    
+    # Start background tasks only if enabled (disabled in multi-worker production)
+    if ENABLE_BACKGROUND_TASKS:
+        print("🔄 Starting background tasks in this worker")
+        background_task = asyncio.create_task(background_tasks_runner())
+    else:
+        print("⏭️  Background tasks disabled (run separately with run_background_tasks.py)")
     
     yield
     
@@ -32,6 +44,9 @@ async def lifespan(app: FastAPI):
             await background_task
         except asyncio.CancelledError:
             pass
+    
+    # Disconnect Redis
+    await cache.disconnect()
     
     await engine.dispose()
 
