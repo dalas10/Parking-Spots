@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_, or_
+from sqlalchemy.orm import selectinload
 
 from app.db.session import get_db
 from app.models.user import User, UserRole
@@ -201,7 +202,7 @@ async def list_my_bookings(
     if status_filter:
         query = query.where(Booking.status == status_filter)
     
-    query = query.order_by(Booking.created_at.desc())
+    query = query.options(selectinload(Booking.parking_spot)).order_by(Booking.created_at.desc())
     
     result = await db.execute(query)
     bookings = result.scalars().all()
@@ -229,7 +230,7 @@ async def list_owner_bookings(
     if status_filter:
         query = query.where(Booking.status == status_filter)
     
-    query = query.order_by(Booking.created_at.desc())
+    query = query.options(selectinload(Booking.parking_spot)).order_by(Booking.created_at.desc())
     
     result = await db.execute(query)
     bookings = result.scalars().all()
@@ -243,7 +244,11 @@ async def get_booking(
     db: AsyncSession = Depends(get_db)
 ):
     """Get booking by ID."""
-    result = await db.execute(select(Booking).where(Booking.id == booking_id))
+    result = await db.execute(
+        select(Booking)
+        .where(Booking.id == booking_id)
+        .options(selectinload(Booking.parking_spot))
+    )
     booking = result.scalar_one_or_none()
     
     if not booking:

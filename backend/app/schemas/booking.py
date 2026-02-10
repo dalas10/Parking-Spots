@@ -5,6 +5,17 @@ from uuid import UUID
 
 from app.models.booking import BookingStatus
 
+class ParkingSpotInBooking(BaseModel):
+    """Minimal parking spot info for booking display"""
+    id: UUID
+    title: str
+    address: str
+    city: str
+    state: str
+    
+    class Config:
+        from_attributes = True
+
 class BookingBase(BaseModel):
     parking_spot_id: UUID
     start_time: datetime
@@ -40,6 +51,7 @@ class BookingResponse(BookingBase):
     checked_out_at: Optional[datetime] = None
     created_at: datetime
     updated_at: datetime
+    parking_spot: Optional[ParkingSpotInBooking] = None
     
     class Config:
         from_attributes = True
