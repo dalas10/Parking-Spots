@@ -64,10 +64,19 @@ Name: Morning Glow
 HEX: #fec538
 RGB: 254, 197, 56
 CMYK: 0%, 22%, 78%, 0%
-Usage: Backgrounds, subtle highlights
+Usage: Backgrounds, subtle highlights, hero gradient start
 ```
 
-### Secondary Colors
+### Hero Gradient
+
+```
+CSS: linear-gradient(135deg, #fec538 0%, #fdb82e 50%, #fe9f1d 100%)
+Colors: Morning Glow → Urbee Gold → Sunset Orange
+Usage: Main hero section, premium feature backgrounds, call-to-action sections
+Effect: Warm, inviting golden gradient that emphasizes the brand's energy
+```
+
+### Tertiary Colors
 
 #### Dark Gray (Text)
 ```

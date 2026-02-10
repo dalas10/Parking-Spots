@@ -1,5 +1,5 @@
 /* Urbee Brand Colors - CSS Variables */
-/* Based on urbee.jpg logo analysis */
+/* Based on urbee.jpg logo analysis and brand identity */
 
 :root {
   /* Primary Brand Colors - Orange/Gold from Logo */
@@ -12,6 +12,7 @@
   /* Gradients */
   --brand-gradient: linear-gradient(135deg, #fe9f1d 0%, #fdb82e 50%, #fec538 100%);
   --brand-gradient-hover: linear-gradient(135deg, #e58a15 0%, #e5a325 50%, #e5af2d 100%);
+  --brand-hero-gradient: linear-gradient(135deg, #fec538 0%, #fdb82e 50%, #fe9f1d 100%);
   
   /* Text Colors */
   --text-primary: #2c3e50;     /* Dark gray for main text */
