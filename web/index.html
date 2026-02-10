@@ -30,26 +30,14 @@
             <h1 data-i18n="hero.title">Find Your Perfect Parking Spot</h1>
             <p data-i18n="hero.subtitle">Rent parking spaces from local owners. Easy, convenient, and affordable.</p>
             
-            <div class="search-box">
-                <input type="text" id="searchInput" data-i18n="hero.search_placeholder" placeholder="Search by city, address, or zip code...">
+            <div class="search-box" style="width: 80%;">
+                <div style="position: relative; flex: 1; ">
+                    <input style ="width: -webkit-fill-available;" type="text" id="searchInput" data-i18n="hero.search_placeholder" placeholder="Search by city, address, or zip code..." autocomplete="off">
+                    <div id="searchSuggestions" class="search-suggestions" style="display: none; "></div>
+                </div>
                 <button class="btn-primary" onclick="searchParking()">
                     <span>🔍</span> <span data-i18n="hero.search_button">Search</span>
                 </button>
-            </div>
-
-            <div class="quick-stats">
-                <div class="stat">
-                    <div class="stat-number" id="totalSpots">0</div>
-                    <div class="stat-label" data-i18n="stats.available_spots">Available Spots</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-number" id="totalCities">0</div>
-                    <div class="stat-label" data-i18n="stats.cities">Cities</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-number" id="avgPrice">$0</div>
-                    <div class="stat-label" data-i18n="stats.avg_price">Avg Price/Hour</div>
-                </div>
             </div>
         </div>
     </main>

@@ -44,6 +44,7 @@ async function apiRequest(endpoint, options = {}) {
 async function searchParkingSpots(params = {}) {
     const queryParams = new URLSearchParams();
     
+    if (params.q) queryParams.append('q', params.q);
     if (params.city) queryParams.append('city', params.city);
     if (params.spot_type) queryParams.append('spot_type', params.spot_type);
     if (params.has_ev_charging !== undefined) queryParams.append('has_ev_charging', params.has_ev_charging);

@@ -1,5 +1,7 @@
 // Home page functionality
 let allSpots = [];
+let allSearchSpots = [];
+let searchCacheLoading = false;
 let currentFilters = {};
 let map = null;
 let markers = [];
@@ -33,11 +35,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 searchParking();
             }
         });
+        
+        // Add input handler for suggestions
+        searchInput.addEventListener('input', handleSearchInput);
+        
+        // Close suggestions when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!searchInput.contains(e.target)) {
+                document.getElementById('searchSuggestions').style.display = 'none';
+            }
+        });
     }
     
     initializeMap();
     loadParkingSpots();
-    loadStats();
 });
 
 // Reload dynamic content when language changes
@@ -337,8 +348,17 @@ function createSpotCard(spot) {
 async function searchParking() {
     const searchInput = document.getElementById('searchInput');
     const query = searchInput.value.trim();
+    const suggestionsDiv = document.getElementById('searchSuggestions');
+    
+    console.log('Search triggered with query:', query);
+    
+    // Hide suggestions
+    if (suggestionsDiv) {
+        suggestionsDiv.style.display = 'none';
+    }
     
     if (!query) {
+        console.log('Empty query, loading all spots');
         loadParkingSpots();
         return;
     }
@@ -352,36 +372,63 @@ async function searchParking() {
     noSpots.style.display = 'none';
     
     try {
-        // Search across all spots without other filters
-        const spots = await searchParkingSpots({ limit: 100 });
+        // Get current filter values
+        const startDate = document.getElementById('filterStartDate')?.value;
+        const startTime = document.getElementById('filterStartTime')?.value;
+        const duration = document.getElementById('filterDuration')?.value;
         
-        // Filter by search query
-        const filtered = spots.filter(spot => 
-            spot.title.toLowerCase().includes(query.toLowerCase()) ||
-            spot.city.toLowerCase().includes(query.toLowerCase()) ||
-            spot.zip_code.includes(query) ||
-            spot.address.toLowerCase().includes(query.toLowerCase())
+        // Build search params with server-side text search
+        const filters = {
+            q: query,  // Use server-side search parameter
+            spot_type: document.getElementById('filterType')?.value || '',
+            has_ev_charging: document.getElementById('filterEV')?.checked || undefined,
+            is_covered: document.getElementById('filterCovered')?.checked || undefined,
+            limit: 100
+        };
+        
+        // Add start_time and calculate end_time if all values are provided
+        if (startDate && startTime && duration) {
+            const startDateTime = new Date(`${startDate}T${startTime}`);
+            filters.start_time = startDateTime.toISOString();
+            
+            const endDateTime = new Date(startDateTime);
+            endDateTime.setHours(endDateTime.getHours() + parseInt(duration));
+            filters.end_time = endDateTime.toISOString();
+        }
+        
+        // Remove undefined values
+        Object.keys(filters).forEach(key => 
+            filters[key] === undefined && delete filters[key]
         );
         
-        allSpots = filtered;
+        console.log('Searching with params:', filters);
+        
+        // Use server-side search
+        const spots = await searchParkingSpots(filters);
+        
+        console.log('Search results:', spots.length, 'matches for:', query);
+        
+        allSpots = spots;
         loadingSpots.style.display = 'none';
         
-        if (filtered.length === 0) {
+        if (spots.length === 0) {
+            console.log('No results found');
             noSpots.style.display = 'block';
             // Clear map markers if no results
-            markers.forEach(marker => map.removeLayer(marker));
-            markers = [];
+            clearMarkers();
             return;
         }
         
+        console.log('Displaying', spots.length, 'results');
+        
         // Update list view
-        filtered.forEach(spot => {
+        spots.forEach(spot => {
             const card = createSpotCard(spot);
             spotsGrid.appendChild(card);
         });
         
-        // Update map view with filtered results
-        updateMapWithSpots(filtered);
+        // Update map view with search results
+        updateMapWithSpots(spots);
     } catch (error) {
         console.error('Search error:', error);
         loadingSpots.style.display = 'none';
@@ -389,20 +436,76 @@ async function searchParking() {
     }
 }
 
-async function loadStats() {
-    try {
-        const spots = await searchParkingSpots({ limit: 100 });
-        
-        document.getElementById('totalSpots').textContent = spots.length;
-        
-        const cities = new Set(spots.map(s => s.city));
-        document.getElementById('totalCities').textContent = cities.size;
-        
-        if (spots.length > 0) {
-            const avgPrice = spots.reduce((sum, s) => sum + s.hourly_rate, 0) / spots.length;
-            document.getElementById('avgPrice').textContent = formatCurrency(avgPrice);
-        }
-    } catch (error) {
-        console.error('Error loading stats:', error);
+// Handle search input for suggestions
+async function handleSearchInput(e) {
+    const query = e.target.value.trim();
+    const suggestionsDiv = document.getElementById('searchSuggestions');
+    
+    if (!query || query.length < 2) {
+        suggestionsDiv.style.display = 'none';
+        return;
     }
+    
+    console.log('Fetching suggestions for:', query);
+    
+    try {
+        // Use server-side search to get matching cities
+        const spots = await searchParkingSpots({ q: query, limit: 50 });
+        
+        if (!spots || spots.length === 0) {
+            console.log('No spots available for suggestions');
+            suggestionsDiv.style.display = 'none';
+            return;
+        }
+        
+        // Extract unique cities from results
+        const cities = [...new Set(spots.map(s => s.city).filter(Boolean))].slice(0, 5);
+        
+        console.log('Found', cities.length, 'city matches:', cities);
+        
+        if (cities.length === 0) {
+            suggestionsDiv.style.display = 'none';
+            return;
+        }
+        
+        suggestionsDiv.innerHTML = cities.map(city => 
+            `<div class="suggestion-item" onclick="selectSuggestion('${city.replace(/'/g, "\\'")}')">📍 ${city}</div>`
+        ).join('');
+        suggestionsDiv.style.display = 'block';
+    } catch (error) {
+        console.error('Suggestions error:', error);
+        suggestionsDiv.style.display = 'none';
+    }
+}
+
+async function ensureSearchCache() {
+    if (allSearchSpots.length > 0) {
+        console.log('Using cached search data:', allSearchSpots.length, 'spots');
+        return allSearchSpots;
+    }
+    if (searchCacheLoading) {
+        console.log('Cache already loading, returning current cache');
+        return allSearchSpots;
+    }
+    searchCacheLoading = true;
+    console.log('Loading search cache...');
+    try {
+        allSearchSpots = await searchParkingSpots({ limit: 100 });
+        console.log('Search cache loaded:', allSearchSpots.length, 'spots');
+    } catch (error) {
+        console.error('Search cache error:', error);
+        allSearchSpots = [];
+    } finally {
+        searchCacheLoading = false;
+    }
+    return allSearchSpots;
+}
+
+// Select a suggestion
+function selectSuggestion(city) {
+    console.log('Suggestion selected:', city);
+    const searchInput = document.getElementById('searchInput');
+    searchInput.value = city;
+    document.getElementById('searchSuggestions').style.display = 'none';
+    searchParking();
 }

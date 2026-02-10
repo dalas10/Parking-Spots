@@ -1,5 +1,5 @@
 from typing import List, Optional
-from datetime import datetime
+from datetime import datetime, timedelta
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, and_, or_
@@ -54,6 +54,7 @@ async def create_parking_spot(
 
 @router.get("/search", response_model=List[ParkingSpotListResponse])
 async def search_parking_spots(
+    q: Optional[str] = Query(None, description="General search query (searches title, address, city)"),
     city: Optional[str] = None,
     state: Optional[str] = None,
     zip_code: Optional[str] = None,
@@ -70,13 +71,25 @@ async def search_parking_spots(
     limit: int = Query(20, ge=1, le=100),
     db: AsyncSession = Depends(get_db)
 ):
-    """Search parking spots with multiple filter options including time-based availability."""
+    """Search parking spots with multiple filter options including time-based availability and general text search."""
     query = select(ParkingSpot).where(
         and_(
             ParkingSpot.is_active == True,
             ParkingSpot.is_available == True
         )
     )
+    
+    # General search query - searches across title, address, and city
+    if q:
+        search_term = f"%{q.lower()}%"
+        query = query.where(
+            or_(
+                func.lower(ParkingSpot.title).like(search_term),
+                func.lower(ParkingSpot.address).like(search_term),
+                func.lower(ParkingSpot.city).like(search_term),
+                func.lower(ParkingSpot.zip_code).like(search_term)
+            )
+        )
     
     # Apply filters
     if city:
@@ -101,29 +114,23 @@ async def search_parking_spots(
     result = await db.execute(query)
     spots = result.scalars().all()
     
-    # Filter out spots with conflicting bookings if time range is provided
+    # Default to next 1 hour availability if no time range provided
+    if not start_time and not end_time:
+        start_time = datetime.utcnow()
+        end_time = start_time + timedelta(hours=1)
+    
+    # Filter out spots with conflicting bookings
     if start_time and end_time:
         available_spots = []
         for spot in spots:
-            # Check for conflicting bookings
+            # Check for conflicting bookings using correct interval overlap logic
+            # Two intervals overlap if: booking_start < search_end AND booking_end > search_start
             conflict_query = select(Booking).where(
                 and_(
                     Booking.parking_spot_id == spot.id,
                     Booking.status.in_([BookingStatus.PENDING, BookingStatus.CONFIRMED, BookingStatus.IN_PROGRESS]),
-                    or_(
-                        and_(
-                            Booking.start_time <= start_time,
-                            Booking.end_time > start_time
-                        ),
-                        and_(
-                            Booking.start_time < end_time,
-                            Booking.end_time >= end_time
-                        ),
-                        and_(
-                            Booking.start_time >= start_time,
-                            Booking.end_time <= end_time
-                        )
-                    )
+                    Booking.start_time < end_time,
+                    Booking.end_time > start_time
                 )
             )
             conflict_result = await db.execute(conflict_query)
@@ -178,6 +185,7 @@ async def search_parking_spots(
 
 @router.get("/", response_model=List[ParkingSpotListResponse])
 async def list_parking_spots(
+    q: Optional[str] = Query(None, description="General search query (searches title, address, city)"),
     latitude: Optional[float] = Query(None, ge=-90, le=90),
     longitude: Optional[float] = Query(None, ge=-180, le=180),
     radius_km: float = Query(10.0, gt=0, le=100),
@@ -194,12 +202,12 @@ async def list_parking_spots(
     page_size: int = Query(20, ge=1, le=100),
     db: AsyncSession = Depends(get_db)
 ):
-    """List parking spots with optional filters and location-based search."""
+    """List parking spots with optional filters, text search, and location-based search."""
     # Use limit if provided, otherwise use page_size
     effective_page_size = limit if limit else page_size
     
-    # Skip cache when date/time filters are used (availability changes dynamically)
-    use_cache = not (start_time and end_time)
+    # Skip cache when date/time filters or search query are used (dynamic results)
+    use_cache = not (start_time and end_time) and not q
     
     if use_cache:
         # Generate cache key from query parameters
@@ -233,9 +241,21 @@ async def list_parking_spots(
         )
     )
     
-    # Apply filters
+    # General search query - searches across title, address, and city
+    if q:
+        search_term = f"%{q.lower()}%"
+        query = query.where(
+            or_(
+                func.lower(ParkingSpot.title).like(search_term),
+                func.lower(ParkingSpot.address).like(search_term),
+                func.lower(ParkingSpot.city).like(search_term),
+                func.lower(ParkingSpot.zip_code).like(search_term)
+            )
+        )
+    
+    # Apply filters (use LIKE for city to support partial matches)
     if city:
-        query = query.where(func.lower(ParkingSpot.city) == city.lower())
+        query = query.where(func.lower(ParkingSpot.city).like(f"%{city.lower()}%"))
     if spot_type:
         query = query.where(ParkingSpot.spot_type == spot_type)
     if vehicle_size:
@@ -254,7 +274,12 @@ async def list_parking_spots(
     result = await db.execute(query)
     spots = result.scalars().all()
     
-    # Filter by availability if date/time range provided
+    # Default to next 1 hour availability if no time range provided
+    if not start_time and not end_time:
+        start_time = datetime.utcnow()
+        end_time = start_time + timedelta(hours=1)
+    
+    # Filter by availability (always check for conflicts)
     if start_time and end_time:
         available_spots = []
         for spot in spots:

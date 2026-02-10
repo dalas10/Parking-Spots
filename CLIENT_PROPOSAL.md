@@ -1,569 +1,511 @@
-# Urbee Platform
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.6;
+    color: #2c3e50;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  thead {
+    background: linear-gradient(135deg, #fdb82e 0%, #fe9f1d 100%);
+    color: white;
+  }
+  
+  th {
+    padding: 15px;
+    text-align: left;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+  }
+  
+  td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #ecf0f1;
+  }
+  
+  tbody tr:nth-child(even) {
+    background-color: #fef9f3;
+  }
+  
+  tbody tr:hover {
+    background-color: #fef5e7;
+  }
+  
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+  
+  h1, h2, h3 {
+    color: #2c3e50;
+  }
+  
+  h2 {
+    border-bottom: 3px solid #fdb82e;
+    padding-bottom: 10px;
+    margin-top: 30px;
+  }
+  
+  .logo-header {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  
+  .logo-header img {
+    max-width: 200px;
+    height: auto;
+    margin-bottom: 20px;
+  }
+</style>
 
-![Urbee Logo](urbee.jpg)
+<div class="logo-header">
+  <img src="urbee.jpg" alt="Urbee Logo" />
+</div>
 
-## Software Development Proposal & Agreement
+# Urbee
+## Software Development Proposal
 
 ---
 
-**Prepared For:** [Client Name]  
-**Prepared By:** [Your Company Name]  
+**Client:** Irana Koutsi  
+**Developer:** Ioannis Daramouskas  
 **Date:** February 10, 2026  
-**Proposal Valid Until:** March 10, 2026  
-**Document Version:** 2.0 - Production Ready
-
-**Brand Colors**: 🟠 #fdb82e (Primary) | ⚫ #2c3e50 (Text) | 🟢 #27ae60 (Success)
-
-**Status**: ✅ Fully deployed and performance-tested in production
+**Project Duration:** 4 Months  
+**Total Investment:** Starting from €15,000 + Revenue Share
 
 ---
 
-## Table of Contents
+## Executive Summary
 
-1. [Executive Summary](#1-executive-summary)
-2. [Project Overview](#2-project-overview)
-3. [Scope of Work](#3-scope-of-work)
-4. [Deliverables](#4-deliverables)
-5. [Technology Stack](#5-technology-stack)
-6. [Development Cost Analysis](#6-development-cost-analysis)
-7. [Investment & Payment Terms](#7-investment--payment-terms)
-8. [Project Timeline](#8-project-timeline)
-9. [Ongoing Costs & Maintenance](#9-ongoing-costs--maintenance)
-10. [Terms & Conditions](#10-terms--conditions)
+Urbee is a comprehensive **peer-to-peer parking marketplace** that connects property owners with drivers seeking parking spaces. The platform enables property owners to monetize unused parking spots while providing drivers with an easy, mobile-first solution to find, book, and pay for parking in real-time.
+
+This proposal outlines the development of a production-ready platform including:
+- **Backend API System** with enterprise-grade infrastructure
+- **Mobile Applications** for iOS and Android
+- **Web Administrative Interface** for management
+- **Complete payment processing** via Stripe
+- **Real-time booking and availability** management
+
+**Market Opportunity:** The peer-to-peer parking market is projected to reach $7.8 billion globally by 2028, with urban parking demand increasing 15% annually.[^1]
 
 ---
 
-## 1. Executive Summary
+<div style="page-break-after: always;"></div>
 
-We are pleased to present this proposal for the development of **ParkingSpots** — a comprehensive peer-to-peer parking rental marketplace platform. This solution will enable property owners to monetize their unused parking spaces while providing users with a seamless mobile experience to find, book, and pay for parking.
+## How Urbee Works
 
-### Value Proposition
+### The Platform Ecosystem
 
-| Benefit | Impact |
-|---------|--------|
-| **Production-Ready** | Fully deployed, tested at 1,666+ RPS with 95% cache hit rate |
-| **High Performance** | <1ms average response time, supporting 1,500-2,500 concurrent users |
-| **Enterprise Infrastructure** | PostgreSQL 14, Redis 6.x, 12-worker architecture |
-| **New Revenue Stream** | Earn from every transaction on the platform |
-| **Market Opportunity** | $5B+ parking marketplace industry |
-| **Full Ownership** | You own 100% of the production-tested codebase |
+Urbee operates as a three-sided marketplace connecting parking space owners, renters, and the platform operator.
+
+```
+┌─────────────────┐         ┌──────────────────┐         ┌─────────────────┐
+│  Space Owners   │◄────────┤  Urbee Platform  ├────────►│     Renters     │
+│                 │         │                  │         │                 │
+│ • List spaces   │         │ • Matchmaking    │         │ • Search spots  │
+│ • Set pricing   │         │ • Payments       │         │ • Book instantly│
+│ • Earn revenue  │         │ • Security       │         │ • Pay securely  │
+└─────────────────┘         └──────────────────┘         └─────────────────┘
+```
+
+### User Journey: Space Owner
+
+1. **Registration** - Owner creates account and completes profile
+2. **Listing Creation** - Adds parking space with photos, location, pricing
+3. **Availability Setup** - Sets hourly/daily/monthly rates and availability
+4. **Booking Reception** - Receives instant notifications when space is booked
+5. **Automatic Payouts** - Receives payments directly to bank account
+
+### User Journey: Renter
+
+1. **Registration** - Renter creates account and completes profile
+2. **Discovery** - Opens mobile app and searches by location/time
+3. **Selection** - Views available spots on interactive map with details
+4. **Booking** - Books instantly with desired time slot
+5. **Payment** - Secure payment via credit card (Stripe)
+6. **Access** - Receives booking confirmation with spot details
+7. **Check-in/out** - App tracks parking session automatically
+8. **Review** - Rates and reviews the parking experience
+
+### Platform Revenue Model
+
+| Revenue Stream | Description | Rate |
+|----------------|-------------|------|
+| **Platform Fee** | Commission on each booking | 10-15% |
+| **Transaction Fee** | Fixed fee per booking | €0.50/booking |
+| **Premium Listings** | Featured spot placement | €10-50/month |
+| **Insurance Fee** | Optional protection coverage | 3-5% |
+
+**Your Revenue Share:** 15-25% of net platform revenue (based on selected payment option)
+
+---
+
+<div style="page-break-after: always;"></div>
+
+## System Architecture & Technology
+
+### Infrastructure Overview
+
+Urbee is built on enterprise-grade technology stack designed for scalability, security, and performance:
+
+**Backend System:**
+- FastAPI (Python) - High-performance REST API
+- PostgreSQL 14 - Reliable database with 300+ concurrent connections
+- Redis 6.x - Caching layer with 95% hit rate
+- 12-Worker Architecture - Handles 1,666+ requests/second
+- Automated Background Tasks - Booking management, cleanup, notifications
+
+**Mobile Applications:**
+- React Native Framework - Single codebase for iOS and Android
+- Native performance with cross-platform efficiency
+- Real-time GPS integration
+- Push notifications ready
+- Offline capability for critical functions
+
+**Payment Processing:**
+- Stripe Integration - Industry-leading payment processor
+- Automated vendor payouts
+- Secure payment card storage
+- Refund and dispute management
+
+**Security & Compliance:**
+- JWT authentication with refresh tokens
+- Encrypted data transmission (HTTPS/TLS)
+- PCI-DSS compliant payment handling
+- GDPR-ready data management
+- Role-based access control
+
+### Performance Metrics
+
+The platform has been production-tested with impressive results:
+
+| Metric | Performance |
+|--------|-------------|
+| Request Handling | 1,666+ requests/second |
+| Response Time | <1ms average |
+| Concurrent Users | 1,500-2,500 supported |
+| Cache Hit Rate | 95% (reduced database load) |
+| Uptime Target | 99.9% |
+
+---
+
+## Core Features & Capabilities
+
+### For Parking Space Owners
+
+**Listing Management**
+- Create unlimited parking space listings
+- Upload multiple photos per listing
+- Set flexible pricing (hourly/daily/monthly rates)
+- Define availability schedules
+- Specify amenities (covered, EV charging, security, lighting)
+- Mark handicap accessibility
+
+**Booking Management**
+- Real-time booking notifications
+- View upcoming, active, and historical bookings
+- Automatic check-in/check-out tracking
+- Earnings dashboard
+- Payout tracking and history
+
+**Revenue Optimization**
+- Dynamic pricing capability
+- Occupancy analytics
+- Performance metrics
+- Seasonal rate adjustments
+
+### For Renters
+
+**Search & Discovery**
+- Location-based search with interactive map
+- Advanced filters (price, distance, amenities, vehicle size)
+- Real-time availability display
+- Distance calculations from current location
+- Spot type selection (driveway, garage, lot, street)
+
+**Booking Experience**
+- Instant booking (no waiting for approval)
+- Automatic price calculation based on duration
+- Secure payment via credit/debit card
+- Digital booking confirmation
+- Add to calendar feature
+
+**Account Management**
+- Booking history and receipts
+- Saved favorite locations
+- Multiple payment methods
+- Profile and vehicle information
+- Review and rating history
+
+### Platform Features
+
+**Review & Rating System**
+- 5-star rating for spots and owners
+- Written reviews with photos
+- Owner response capability
+- Aggregate ratings displayed
+- Verified booking reviews only
+
+**Notifications & Alerts**
+- Booking confirmation notifications
+- Check-in/check-out reminders
+- Payment receipts
+- Review requests
+- Spot availability alerts
+
+**Administrative Tools**
+- User management dashboard
+- Transaction monitoring
+- Dispute resolution workflow
+- Analytics and reporting
+- Revenue tracking
+
+---
+
+<div style="page-break-after: always;"></div>
+
+## Project Investment
+
+### Development Value
+
+The market value for developing a complete parking marketplace platform with the features and quality of Urbee is **€75,000**, including:
+- Backend API development and infrastructure
+- iOS and Android mobile applications  
+- Payment system integration
+- Testing and quality assurance
+- Documentation and deployment
 
 ### Investment Options
 
-Choose the payment structure that fits your business:
+Choose the payment structure that aligns with your business goals:
 
-| Option | Upfront Fee | Revenue Share | Recommended |
-|--------|-------------|---------------|-------------|
-| **Option 1** | €20,000 | 20% | Balanced |
-| **Option 2** | €15,000 | 25% | Lower initial cost |
-| **Option 3** | €25,000 | 15% | Lower ongoing share |
+| Option | Upfront Payment | Revenue Share | Total Dev Cost | Your Savings |
+|--------|-----------------|---------------|----------------|--------------|
+| **Option A** | €20,000 | 20% | €20,000 | 73% off market |
+| **Option B** | €15,000 | 25% | €15,000 | 80% off market |
+| **Option C** | €25,000 | 15% | €25,000 | 67% off market |
 
----
+**Revenue Share Definition:** Percentage of net platform revenue (gross booking revenue minus payment processor fees, refunds, and chargebacks) paid monthly.
 
-## 2. Project Overview
-
-### 2.1 The Problem
-
-- Urban parking is scarce and expensive
-- Private parking spaces sit unused for hours daily
-- No easy way to connect parking owners with drivers
-- Existing solutions are limited to commercial parking only
-
-### 2.2 The Solution
-
-ParkingSpots is a two-sided marketplace that:
-
-1. **For Parking Owners:** Provides tools to list, manage, and earn from their parking spaces
-2. **For Drivers:** Offers a mobile app to discover, book, and pay for convenient parking
-
-### 2.3 Target Users
-
-| User Type | Description | Needs |
-|-----------|-------------|-------|
-| **Property Owners** | Homeowners, businesses, churches, schools | Monetize unused parking |
-| **Daily Commuters** | Office workers, students | Reliable daily parking |
-| **Event Attendees** | Sports fans, concertgoers | Parking near venues |
-| **Urban Drivers** | City residents, visitors | Affordable short-term parking |
+**Why This Structure?**
+This partnership model aligns our success with yours. The reduced upfront fee makes the platform financially accessible, while the revenue share ensures ongoing commitment to platform performance and growth.
 
 ---
 
-## 3. Scope of Work
+## Project Timeline & Milestones
 
-### 3.1 Included Features
+### Phase 1: Foundation (Weeks 1-4)
+**Duration:** 4 weeks  
+**Focus:** Backend API & Database
 
-#### User Management
-- ✅ User registration & authentication
-- ✅ Profile management
-- ✅ Role-based access (Renter, Owner, Admin)
-- ✅ Password reset & security
+**Deliverables:**
+- ✓ Database schema design and implementation
+- ✓ User authentication and authorization system
+- ✓ Core API endpoints (users, spots, bookings)
+- ✓ Payment integration setup
+- ✓ Admin API endpoints
 
-#### Parking Spot Management
-- ✅ Create, edit, delete listings
-- ✅ Photo upload support
-- ✅ Pricing configuration (hourly/daily/monthly)
-- ✅ Availability scheduling
-- ✅ Amenity metadata (EV charging, covered, etc.)
-
-#### Search & Discovery
-- ✅ Location-based search with map view
-- ✅ Advanced filters (price, type, amenities)
-- ✅ Distance calculations
-- ✅ Real-time availability display
-
-#### Booking System
-- ✅ Instant booking flow
-- ✅ Price calculation engine
-- ✅ Booking management (upcoming, active, past)
-- ✅ Check-in/check-out tracking
-- ✅ Cancellation handling
-
-#### Payment Processing
-- ✅ Secure payment via Stripe
-- ✅ Automatic owner payouts
-- ✅ Refund processing
-- ✅ Transaction history
-
-#### Reviews & Ratings
-- ✅ 5-star rating system
-- ✅ Written reviews
-- ✅ Owner response capability
-- ✅ Rating aggregation
-
-### 3.2 Exclusions
-
-The following are not included in this proposal:
-
-- ❌ Custom admin dashboard (can be added for additional fee)
-- ❌ SMS/Push notification service integration
-- ❌ Customer support chat system
-- ❌ Marketing website/landing pages
-- ❌ App Store submission fees
-- ❌ Ongoing server hosting costs
-- ❌ Third-party service subscription fees
+**Payment Milestone 1:** 30% of upfront fee
 
 ---
 
-## 4. Deliverables
+### Phase 2: Backend Completion (Weeks 5-8)
+**Duration:** 4 weeks  
+**Focus:** Advanced Features & Integration
 
-### 4.1 Complete Deliverables List
+**Deliverables:**
+- ✓ Search and discovery algorithms
+- ✓ Location-based filtering
+- ✓ Booking management system
+- ✓ Automated payout system
+- ✓ Review and rating system
+- ✓ Real-time availability tracking
+- ✓ API documentation (Swagger/OpenAPI)
 
-| # | Deliverable | Description |
-|---|-------------|-------------|
-| 1 | **Backend API** | Complete FastAPI server with all endpoints |
-| 2 | **Database Schema** | PostgreSQL database with all tables |
-| 3 | **Mobile App (iOS)** | React Native app ready for App Store |
-| 4 | **Mobile App (Android)** | React Native app ready for Play Store |
-| 5 | **API Documentation** | Full Swagger/OpenAPI documentation |
-| 6 | **Technical Documentation** | Architecture and deployment guides |
-| 7 | **Source Code** | Complete, commented source code |
-| 8 | **Deployment Guide** | Step-by-step deployment instructions |
+**Payment Milestone 2:** 30% of upfront fee
 
-### 4.2 Source Code Components
+---
+
+### Phase 3: Mobile App Development (Weeks 9-14)
+**Duration:** 6 weeks  
+**Focus:** iOS & Android Applications
+
+**Deliverables:**
+- ✓ Mobile app architecture setup
+- ✓ Authentication and user flows
+- ✓ Map integration (Google Maps)
+- ✓ Search and filter interface
+- ✓ Booking flow and payment UI
+- ✓ User profile and settings
+- ✓ Booking management screens
+- ✓ Review and rating interface
+- ✓ Push notification setup
+- ✓ iOS and Android builds
+
+**Payment Milestone 3:** 30% of upfront fee
+
+---
+
+### Phase 4: Testing & Launch (Weeks 15-16)
+**Duration:** 2 weeks  
+**Focus:** Quality Assurance & Deployment
+
+**Deliverables:**
+- ✓ Comprehensive testing (unit, integration, end-to-end)
+- ✓ Bug fixes and optimization
+- ✓ Performance testing and tuning
+- ✓ Security audit
+- ✓ Production deployment
+- ✓ App store submission preparation
+- ✓ Technical documentation
+- ✓ Training and handoff
+
+**Payment Milestone 4:** 10% of upfront fee (final payment)
+
+---
+
+### Gantt Chart Overview
 
 ```
-Delivered Package:
-├── backend/                    # Python/FastAPI Backend
-│   ├── app/
-│   │   ├── api/               # REST API endpoints
-│   │   ├── core/              # Configuration & security
-│   │   ├── db/                # Database configuration
-│   │   ├── models/            # Data models (6 models)
-│   │   └── schemas/           # API schemas
-│   ├── requirements.txt       # Python dependencies
-│   └── Dockerfile             # Container configuration
-│
-├── mobile/                     # React Native Mobile App
-│   ├── src/
-│   │   ├── screens/           # 6+ app screens
-│   │   ├── components/        # Reusable UI components
-│   │   ├── services/          # API integration layer
-│   │   ├── stores/            # State management
-│   │   └── navigation/        # App navigation
-│   ├── App.tsx                # Application entry
-│   └── package.json           # Node dependencies
-│
-└── documentation/              # All Documentation
-    ├── README.md
-    ├── TECHNICAL_DOCUMENTATION.md
-    └── API_REFERENCE.md
+Month 1          Month 2          Month 3          Month 4
+|═══════════════|═══════════════|═══════════════|═══════════════|
+█████████████                                                      Phase 1: Foundation
+              ██████████████                                       Phase 2: Backend
+                              ████████████████████                 Phase 3: Mobile App
+                                                  ████████          Phase 4: Testing & Launch
+|                |                |                |                |
+Week 1-4         Week 5-8         Week 9-14        Week 15-16
+└─30%            └─30%            └─30%            └─10%            Payment Points
 ```
 
 ---
 
-## 5. Technology Stack
+## Payment Schedule
 
-### 5.1 Technology Choices
+### Option A: €20,000 + 20% Revenue Share
 
-| Layer | Technology | Industry Standard | Rationale |
-|-------|------------|-------------------|-----------|
-| **Backend** | Python + FastAPI | ✅ Yes | High performance, auto-documentation |
-| **Database** | PostgreSQL | ✅ Yes | Reliable, scalable, feature-rich |
-| **Mobile** | React Native | ✅ Yes | Cross-platform, native performance |
-| **Payments** | Stripe | ✅ Yes | Industry leader, marketplace support |
-| **Maps** | Google Maps | ✅ Yes | Best coverage, reliable |
-| **Hosting** | AWS/GCP | ✅ Yes | Enterprise-grade infrastructure |
+| Milestone | Timeline | Payment | Cumulative |
+|-----------|----------|---------|------------|
+| **Project Kickoff** | Upon contract signing | €6,000 (30%) | €6,000 |
+| **Backend Complete** | End of Week 8 | €6,000 (30%) | €12,000 |
+| **Mobile App Complete** | End of Week 14 | €6,000 (30%) | €18,000 |
+| **Final Delivery** | End of Week 16 | €2,000 (10%) | €20,000 |
+| **Revenue Share** | Monthly after launch | 20% of net revenue | Ongoing |
 
-### 5.2 Architecture Benefits
+### Option B: €15,000 + 25% Revenue Share
 
-- **Scalable:** Handles 1,500-2,500 concurrent users (tested in production)
-- **High Performance:** 1,666+ RPS with <1ms average response time
-- **Efficient:** 95% Redis cache hit rate reduces database load
-- **Reliable:** Multi-worker architecture with automatic failover
-- **Secure:** Industry-standard encryption and authentication
-- **Maintainable:** Clean code architecture for easy updates
-- **Cross-Platform:** Single codebase for iOS and Android
+| Milestone | Timeline | Payment | Cumulative |
+|-----------|----------|---------|------------|
+| **Project Kickoff** | Upon contract signing | €4,500 (30%) | €4,500 |
+| **Backend Complete** | End of Week 8 | €4,500 (30%) | €9,000 |
+| **Mobile App Complete** | End of Week 14 | €4,500 (30%) | €13,500 |
+| **Final Delivery** | End of Week 16 | €1,500 (10%) | €15,000 |
+| **Revenue Share** | Monthly after launch | 25% of net revenue | Ongoing |
 
-### 5.3 Production Performance Metrics
+### Option C: €25,000 + 15% Revenue Share
 
-**Infrastructure:**
-- **Backend**: 12 worker processes (FastAPI + Uvicorn)
-- **Database**: PostgreSQL 14 (300 max connections, 3GB shared buffers)
-- **Cache**: Redis 6.x with hiredis parser
-- **Background**: Separate worker for automated booking management
-
-**Benchmark Results:**
-
-| Metric | Single Worker | Production (12 Workers) | Improvement |
-|--------|--------------|-------------------------|-------------|
-| Requests/Second | 515 RPS | 1,666+ RPS | 3.2x |
-| Avg Response Time | 1-2ms | <1ms | 2x faster |
-| Cache Hit Rate | 94% | 95% | Optimized |
-| Concurrent Users | ~500 | 1,500-2,500 | 4x capacity |
-
-**Key Features:**
-- ✅ Auto-checkout expired bookings (every 60 seconds)
-- ✅ Auto-start bookings at scheduled time
-- ✅ Real-time monitoring dashboard (`./monitor.sh`)
-- ✅ Comprehensive load testing suite (`./load_test.sh`)
-- ✅ Systemd service integration for production
-- ✅ Row-level locking prevents double-booking
-- ✅ Connection pooling optimized for scale
+| Milestone | Timeline | Payment | Cumulative |
+|-----------|----------|---------|------------|
+| **Project Kickoff** | Upon contract signing | €7,500 (30%) | €7,500 |
+| **Backend Complete** | End of Week 8 | €7,500 (30%) | €15,000 |
+| **Mobile App Complete** | End of Week 14 | €7,500 (30%) | €22,500 |
+| **Final Delivery** | End of Week 16 | €2,500 (10%) | €25,000 |
+| **Revenue Share** | Monthly after launch | 15% of net revenue | Ongoing |
 
 ---
 
-## 6. Development Cost Analysis
+## Deliverables
 
-### 6.1 Market Rate Comparison
+Upon completion, you will receive:
 
-The following represents typical market pricing for developing a complete parking marketplace platform like ParkingSpots:
+### Source Code & Applications
+1. **Complete Backend System** - Fully documented Python/FastAPI application
+2. **iOS Mobile App** - Ready for App Store submission
+3. **Android Mobile App** - Ready for Google Play submission
+4. **Database Schema** - PostgreSQL database with all tables and relationships
+5. **API Documentation** - Interactive Swagger/OpenAPI documentation
 
-#### Component Breakdown
+### Documentation Package
+6. **Technical Documentation** - Architecture, setup, and deployment guides
+7. **API Reference** - Complete endpoint documentation with examples
+8. **User Guides** - For owners and renters
+9. **Admin Manual** - Platform management instructions
 
-| Component | Market Price |
-|-----------|--------------|
-| **Backend API Development** | $40,000 |
-| • FastAPI server with async architecture | |
-| • PostgreSQL database design & implementation | |
-| • JWT authentication & security | |
-| • User management system | |
-| • Parking spots CRUD & search (location-based) | |
-| • Instant booking system | |
-| • Stripe payment integration | |
-| • Automated payout system | |
-| • Reviews & ratings system | |
-| • Real-time availability (WebSocket/Redis) | |
-| • API documentation | |
-| **Mobile App Development** | $48,000 |
-| • React Native for iOS & Android | |
-| • Full navigation architecture | |
-| • Authentication & user management | |
-| • Interactive map with search | |
-| • Advanced filtering system | |
-| • Instant booking flow | |
-| • Stripe payment UI integration | |
-| • User profiles & settings | |
-| • Reviews & ratings interface | |
-| • State management (Zustand) | |
-| • Push notifications setup | |
-| **UI/UX Design** | $8,000 |
-| • User interface design for all screens | |
-| • User experience optimization | |
-| • Brand identity elements | |
-| **Technical Documentation** | $3,000 |
-| • Complete technical documentation | |
-| • API reference documentation | |
-| • Deployment guides | |
-| **DevOps & Deployment** | $5,000 |
-| • Docker containerization | |
-| • Database setup & optimization | |
-| • CI/CD pipeline configuration | |
-| • Environment setup | |
-| **Quality Assurance** | $8,000 |
-| • Comprehensive testing (unit, integration) | |
-| • Bug fixes & optimization | |
-| • Cross-platform testing | |
-| • Performance optimization | |
+### Infrastructure & Deployment
+10. **Docker Configuration** - Containerized deployment setup
+11. **Environment Templates** - Configuration for staging and production
+12. **Deployment Scripts** - Automated deployment tools
+13. **CI/CD Pipeline** - Continuous integration/deployment configuration
 
-### 6.2 Total Market Value
-
-| Category | Cost |
-|----------|------|
-| Backend API Development | $40,000 |
-| Mobile App Development | $48,000 |
-| UI/UX Design | $8,000 |
-| Technical Documentation | $3,000 |
-| DevOps & Deployment | $5,000 |
-| Quality Assurance | $8,000 |
-| **Total Market Value** | **$118,000** |
-
-### 6.3 Your Investment Options
-
-Choose the payment structure that best fits your business model:
-
-#### **Option 1: Balanced Partnership**
-- **Upfront Fee:** €20,000
-- **Revenue Share:** 20% ongoing
-- **Your Savings:** €98,000 (83% vs market)
-- **Best For:** Balanced risk/reward with moderate upfront investment
-
-#### **Option 2: Lower Initial Investment**
-- **Upfront Fee:** €15,000
-- **Revenue Share:** 25% ongoing
-- **Your Savings:** €103,000 (87% vs market)
-- **Best For:** Minimizing initial capital while sharing more growth upside
-
-#### **Option 3: Higher Upfront, Lower Share**
-- **Upfront Fee:** €25,000
-- **Revenue Share:** 15% ongoing
-- **Your Savings:** €93,000 (79% vs market)
-- **Best For:** Maximizing long-term profitability with higher initial investment
-
-> **Note:** All options include the complete platform with identical features and quality. The significantly reduced development fee is offset by the revenue sharing agreement, creating a win-win partnership where both parties benefit from the platform's success.
+### Intellectual Property
+- **Full Source Code Ownership** - You own 100% of the codebase
+- **No Licensing Restrictions** - Freedom to modify and extend
+- **No Ongoing License Fees** - One-time development fee only
 
 ---
 
-## 7. Investment & Payment Terms
+<div style="page-break-after: always;"></div>
 
-### 7.1 Fee Structure Options
+## Terms & Conditions
 
-Select one of the following investment structures:
+### Intellectual Property
+- Client receives full ownership of all source code upon final payment
+- Developer retains rights to use project as portfolio example
+- Third-party libraries remain under their respective licenses
 
-#### **Option 1: €20,000 + 20% Revenue Share**
+### Revenue Share Terms
+- Terms and conditions for revenue sharing will be detailed in a separate agreement
+- Subject to negotiation and mutual consent
+- To be finalized before project commencement
 
-**A. Development Fee: €20,000**
+### Warranty & Support
+- Support terms and warranty conditions will be outlined in the final contract
+- Specific details under consideration and subject to agreement
+- To be discussed during contract execution phase
 
-| Milestone | Percentage | Amount | Due |
-|-----------|------------|--------|-----|
-| Project Kickoff | 30% | €6,000 | Upon signing (February 2026) |
-| Backend Completion | 30% | €6,000 | End of March 2026 |
-| Mobile App Completion | 30% | €6,000 | End of May 2026 |
-| Final Delivery | 10% | €2,000 | June 2026 |
-| **Total** | **100%** | **€20,000** | |
+### Acceptance Criteria
+- All features as specified in this proposal are functional
+- Applications run without critical bugs
+- Code is documented and deployable
+- All deliverables are provided
 
-**B. Revenue Share: 20% of Net Platform Revenue**
-
-#### **Option 2: €15,000 + 25% Revenue Share**
-
-**A. Development Fee: €15,000**
-
-| Milestone | Percentage | Amount | Due |
-|-----------|------------|--------|-----|
-| Project Kickoff | 30% | €4,500 | Upon signing (February 2026) |
-| Backend Completion | 30% | €4,500 | End of March 2026 |
-| Mobile App Completion | 30% | €4,500 | End of May 2026 |
-| Final Delivery | 10% | €1,500 | June 2026 |
-| **Total** | **100%** | **€15,000** | |
-
-**B. Revenue Share: 25% of Net Platform Revenue**
-
-#### **Option 3: €25,000 + 15% Revenue Share**
-
-**A. Development Fee: €25,000**
-
-| Milestone | Percentage | Amount | Due |
-|-----------|------------|--------|-----|
-| Project Kickoff | 30% | €7,500 | Upon signing (February 2026) |
-| Backend Completion | 30% | €7,500 | End of March 2026 |
-| Mobile App Completion | 30% | €7,500 | End of May 2026 |
-| Final Delivery | 10% | €2,500 | June 2026 |
-| **Total** | **100%** | **€25,000** | |
-
-**B. Revenue Share: 15% of Net Platform Revenue**
+### Termination
+- Either party may terminate with 30 days written notice
+- Client pays for work completed up to termination
+- Ownership transfers for completed, paid milestones
+- Revenue share ceases upon development termination
 
 ---
 
-**Definition of Net Platform Revenue** (applies to all options):
-- Total booking revenue collected through the platform
-- MINUS payment processor fees (typically 2.9% + $0.30)
-- MINUS refunds issued
-- MINUS chargebacks
+## References
 
-**Revenue Share Comparison Examples:**
-
-| Monthly Gross Revenue | Net Revenue | Option 1 (20%) | Option 2 (25%) | Option 3 (15%) |
-|-----------------------|-------------|----------------|----------------|----------------|
-| €10,000 | €9,700 | €1,940 | €2,425 | €1,455 |
-| €50,000 | €48,500 | €9,700 | €12,125 | €7,275 |
-| €100,000 | €97,000 | €19,400 | €24,250 | €14,550 |
-| €500,000 | €485,000 | €97,000 | €121,250 | €72,750 |
-
-### 7.2 Revenue Share Terms
-
-1. **Reporting Period:** Monthly, ending on the last day of each calendar month
-2. **Payment Due:** Within 15 days of month end
-3. **Reporting:** Client provides monthly revenue report with transaction details
-4. **Audit Rights:** Developer may audit records once per year with 30 days notice
-5. **Minimum Term:** Revenue share applies for 5 years from launch date
-6. **Buyout Option:** Client may terminate revenue share with a one-time payment equal to 24 months of average revenue share (based on trailing 12 months)
+[^1]: Grand View Research. (2023). "Peer-to-Peer Parking Market Size, Share & Trends Analysis Report." Market Analysis Report. Available at: https://www.grandviewresearch.com/industry-analysis/peer-to-peer-parking-market
 
 ---
 
-## 8. Project Timeline
+## Next Steps
 
-**Project Start:** February 2026  
-**Final Delivery:** June 2026  
-**Total Duration:** 16 weeks
+To proceed with this project:
 
-### 8.1 Development Schedule
+1. **Review & Select:** Choose your preferred investment option (A, B, or C)
+2. **Contract Execution:** Sign the Software Development Agreement
+3. **Initial Payment:** Transfer first milestone payment (30%)
+4. **Project Kickoff:** Schedule kickoff meeting to finalize requirements
+5. **Development Begins:** We start work immediately upon payment receipt
 
-```
-Weeks 1-4 (February 2026): Backend Foundation & Development
-├── Environment configuration
-├── Database schema implementation
-├── Core authentication system
-├── User management API
-├── Parking spots CRUD API
-├── Search & filtering system
-├── Booking system implementation
-└── Payment integration (Stripe)
-
-Weeks 5-8 (March 2026): Backend Completion & Mobile Setup
-├── Automated payout system
-├── Reviews & ratings system
-├── API documentation & testing
-├── Mobile project setup
-├── Navigation architecture
-└── Authentication screens
-
-Weeks 9-12 (April-May 2026): Mobile App Development
-├── Home screen with interactive map
-├── Search & listing screens
-├── Booking flow implementation
-├── Payment integration
-├── User profile & settings
-└── Reviews system UI
-
-Weeks 13-16 (May-June 2026): Testing, Refinement & Delivery
-├── Integration testing (backend + mobile)
-├── Cross-platform testing (iOS & Android)
-├── Bug fixes & optimization
-├── Performance tuning
-├── Documentation finalization
-├── Deployment setup
-└── Final delivery & handoff
-```
-
-### 8.2 Milestone Schedule
-
-| Milestone | Timeline | Deliverable |
-|-----------|----------|-------------|
-| **M1: Kickoff** | February 2026 | Project start, requirements confirmed |
-| **M2: Backend Complete** | End of March 2026 | All backend APIs functional & tested |
-| **M3: Mobile Alpha** | End of April 2026 | Core mobile screens complete |
-| **M4: Mobile Complete** | End of May 2026 | All mobile features implemented |
-| **M5: Final Delivery** | June 2026 | Fully tested, documented, delivered |
-
----
-
-## 9. Ongoing Costs & Maintenance
-
-### 9.1 Third-Party Service Costs (Client Responsibility)
-
-| Service | Provider | Estimated Monthly Cost |
-|---------|----------|------------------------|
-| **Cloud Hosting** | AWS/GCP/DigitalOcean | $50 - $500* |
-| **Database** | Managed PostgreSQL | $15 - $100* |
-| **Redis Cache** | Managed Redis | $15 - $50* |
-| **Payment Processing** | Stripe | 2.9% + $0.30 per transaction |
-| **Maps API** | Google Maps | $200/month (after free tier) |
-| **Email Service** | SendGrid/AWS SES | $15 - $50* |
-| **Push Notifications** | Firebase | Free tier usually sufficient |
-| **SSL Certificate** | Let's Encrypt | Free |
-| **Domain Name** | Any registrar | $12 - $50/year |
-
-*Costs scale with usage
-
-### 9.2 Estimated Monthly Operating Costs
-
-| Stage | Users | Bookings/Month | Est. Hosting | Est. APIs | Total |
-|-------|-------|----------------|--------------|-----------|-------|
-| **Launch** | < 1,000 | < 500 | $100 | $50 | ~$150/mo |
-| **Growth** | 1,000 - 10,000 | 500 - 5,000 | $300 | $200 | ~$500/mo |
-| **Scale** | 10,000 - 100,000 | 5,000 - 50,000 | $1,000 | $500 | ~$1,500/mo |
-| **Enterprise** | 100,000+ | 50,000+ | $3,000+ | $1,000+ | ~$4,000+/mo |
-
-### 9.3 Optional Maintenance Package
-
-| Package | Monthly Fee | Includes |
-|---------|-------------|----------|
-| **Basic** | $500/mo | Bug fixes, security patches |
-| **Standard** | $1,500/mo | Basic + minor feature updates, hosting management |
-| **Premium** | $3,500/mo | Standard + priority support, major updates, 24/7 monitoring |
-
----
-
-## 10. Terms & Conditions
-
-### 10.1 Intellectual Property
-
-1. **Source Code Ownership:** Upon full payment of the development fee, Client owns 100% of the delivered source code.
-
-2. **Revenue Share Rights:** The revenue share agreement grants Developer a financial interest in platform revenue, not ownership of the code or business.
-
-3. **Third-Party Components:** Open-source libraries and frameworks remain under their respective licenses.
-
-4. **Residual Rights:** Developer retains no rights to use Client's specific implementation, branding, or user data.
-
-### 10.2 Warranties
-
-1. **Functional Warranty:** Developer warrants the software will function as described in this proposal for 90 days post-delivery.
-
-2. **Bug Fixes:** Developer will fix any bugs reported within the warranty period at no additional cost.
-
-3. **Exclusions:** Warranty does not cover issues caused by:
-   - Third-party service failures
-   - Client modifications to source code
-   - Hosting environment issues
-   - Misuse of the platform
-
-### 10.3 Confidentiality
-
-Both parties agree to keep confidential:
-- Business strategies and plans
-- Technical implementations
-- Financial information
-- User data and metrics
-
-### 10.4 Limitation of Liability
-
-Developer's total liability shall not exceed the development fee paid (per selected option: €15,000, €20,000, or €25,000). Developer is not liable for:
-- Lost profits or revenue
-- Business interruption
-- Third-party claims
-- Indirect or consequential damages
-
-### 10.5 Revenue Share Compliance
-
-1. Client agrees to maintain accurate financial records
-2. Client will provide monthly revenue reports by the 5th of each month
-3. Late payments incur 1.5% monthly interest
-4. 3 consecutive missed payments constitute breach
-
-### 10.6 Termination
-
-**By Client:**
-- May terminate development with 14 days notice
-- Fees paid for completed milestones are non-refundable
-- Revenue share continues on any delivered components used
-
-**By Developer:**
-- May terminate for non-payment (30 days overdue)
-- Will deliver all completed work upon termination
-
-**Revenue Share Termination:**
-- 5-year minimum term
-- After 5 years: Client may terminate with 90 days notice
-- Buyout option available (see Section 7.2)
+**Questions?** Contact Ioannis Daramouskas:
+- Email: idaramouskas@gmail.com
+- Phone: +30 694 572 3606
+- Available: Monday-Friday, 9:00-18:00 EET
 
 ---
 
@@ -571,52 +513,20 @@ Developer's total liability shall not exceed the development fee paid (per selec
 
 By signing below, both parties agree to the terms outlined in this proposal.
 
-### Client
+**Client Signature:**
 
-**Company Name:** _________________________________
+___________________________________  
+Irana Koutsi  
+Date: _______________
 
-**Authorized Signatory:** _________________________________
+**Developer Signature:**
 
-**Title:** _________________________________
+___________________________________  
+Ioannis Daramouskas  
+Date: _______________
 
-**Signature:** _________________________________
-
-**Date:** _________________________________
-
----
-
-### Developer
-
-**Company Name:** _________________________________
-
-**Authorized Signatory:** _________________________________
-
-**Title:** _________________________________
-
-**Signature:** _________________________________
-
-**Date:** _________________________________
+**Selected Investment Option:** ☐ Option A ☐ Option B ☐ Option C
 
 ---
 
-## Appendix A: Feature Specifications
-
-*Detailed technical specifications available in TECHNICAL_DOCUMENTATION.md*
-
-## Appendix B: API Endpoint List
-
-| Module | Endpoints | Description |
-|--------|-----------|-------------|
-| Authentication | 4 | Register, login, refresh, password reset |
-| Users | 5 | Profile CRUD, settings |
-| Parking Spots | 8 | Listings CRUD, search, availability |
-| Bookings | 8 | Booking CRUD, pricing, status |
-| Reviews | 7 | Reviews CRUD, ratings |
-| Payments | 8 | Payments, refunds, payouts |
-| **Total** | **40** | Complete REST API |
-
----
-
-**Questions?** Contact [Your Email] or [Your Phone]
-
-*This document constitutes a binding agreement upon signature by both parties.*
+*This proposal is valid for 30 days from the date above. After that date, pricing and terms are subject to review and may change.*
