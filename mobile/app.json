@@ -25,6 +25,10 @@
     },
     "android": {
       "package": "com.urbee.app",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "backgroundColor": "#fdb82e"
+      },
       "permissions": [
         "ACCESS_COARSE_LOCATION",
         "ACCESS_FINE_LOCATION"
