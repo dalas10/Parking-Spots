@@ -132,8 +132,7 @@ async function loadParkingSpots() {
         // Get filter values
         const startDate = document.getElementById('filterStartDate')?.value;
         const startTime = document.getElementById('filterStartTime')?.value;
-        const endDate = document.getElementById('filterEndDate')?.value;
-        const endTime = document.getElementById('filterEndTime')?.value;
+        const duration = document.getElementById('filterDuration')?.value;
         
         const filters = {
             city: filterCity?.value || '',
@@ -143,12 +142,15 @@ async function loadParkingSpots() {
             limit: 50
         };
         
-        // Add start_time and end_time if both date and time are provided
-        if (startDate && startTime) {
-            filters.start_time = `${startDate}T${startTime}:00Z`;
-        }
-        if (endDate && endTime) {
-            filters.end_time = `${endDate}T${endTime}:00Z`;
+        // Add start_time and calculate end_time if all values are provided
+        if (startDate && startTime && duration) {
+            const startDateTime = new Date(`${startDate}T${startTime}`);
+            filters.start_time = startDateTime.toISOString();
+            
+            // Calculate end time by adding duration hours
+            const endDateTime = new Date(startDateTime);
+            endDateTime.setHours(endDateTime.getHours() + parseInt(duration));
+            filters.end_time = endDateTime.toISOString();
         }
         
         // Remove undefined values

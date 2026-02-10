@@ -70,10 +70,12 @@
 
             <h2 data-i18n="spot.title">Available Parking Spots</h2>
             <div class="filters">
-                <input type="date" id="filterStartDate" onchange="applyFilters()" placeholder="Start Date">
-                <input type="time" id="filterStartTime" onchange="applyFilters()" placeholder="Start Time">
-                <input type="date" id="filterEndDate" onchange="applyFilters()" placeholder="End Date">
-                <input type="time" id="filterEndTime" onchange="applyFilters()" placeholder="End Time">
+                <input type="date" id="filterStartDate" onchange="applyFilters()" placeholder="Start Date" title="Start Date">
+                <input type="time" id="filterStartTime" onchange="applyFilters()" placeholder="Start Time" title="Start Time">
+                <label style="display: flex; align-items: center; gap: 0.3rem;">
+                    <input type="number" id="filterDuration" min="1" max="24" step="1" placeholder="Duration" onchange="applyFilters()" style="width: 90px;" title="Duration in hours">
+                    <span style="color: var(--text-light); font-size: 0.9rem;">hours</span>
+                </label>
                 <select id="filterCity" onchange="applyFilters()">
                     <option value="" data-i18n="filters.all_cities">All Cities</option>
                 </select>
