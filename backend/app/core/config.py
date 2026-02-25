@@ -8,6 +8,11 @@ class Settings(BaseSettings):
     
     # Database
     DATABASE_URL: str = "postgresql+asyncpg://postgres:password@localhost:5432/parkingspots"
+    DB_POOL_SIZE: int = 20          # persistent connections kept open
+    DB_MAX_OVERFLOW: int = 10       # extra connections allowed under burst load (total = 30)
+    DB_POOL_TIMEOUT: int = 30       # seconds to wait for a free connection before raising
+    DB_POOL_RECYCLE: int = 1800     # recycle connections after 30 min (prevents stale TCP)
+    DB_ECHO: bool = False           # set True locally to log SQL
     
     # Security
     SECRET_KEY: str = "your-super-secret-key-change-in-production"
