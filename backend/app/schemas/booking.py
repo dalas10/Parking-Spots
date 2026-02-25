@@ -11,7 +11,7 @@ class ParkingSpotInBooking(BaseModel):
     title: str
     address: str
     city: str
-    state: str
+    prefecture: str
     
     class Config:
         from_attributes = True

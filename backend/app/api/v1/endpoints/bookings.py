@@ -137,7 +137,7 @@ async def create_booking(
             )
         ).with_for_update()  # Lock rows to prevent race conditions
     )
-    conflicting = result.scalar_one_or_none()
+    conflicting = result.scalars().first()
     
     if conflicting:
         raise HTTPException(
