@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { WebView } from 'react-native-webview';
 
-const SERVER_URL = 'http://192.168.53.100:3000';
+const SERVER_URL = 'http://150.140.12.161:3000';
 
 export default function App() {
   const webviewRef = useRef<WebView>(null);
