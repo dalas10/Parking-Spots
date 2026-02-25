@@ -19,15 +19,21 @@ def get_password_hash(password: str) -> str:
     """Hash a password."""
     return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt(12)).decode("utf-8")
 
+# Semaphore caps concurrent bcrypt ops — prevents thread pool saturation
+# under heavy login load (bcrypt ~200ms CPU each, default pool = cpu_count+4)
+_BCRYPT_SEM = asyncio.Semaphore(20)
+
 async def verify_password_async(plain_password: str, hashed_password: str) -> bool:
     """Non-blocking bcrypt verify — runs in a thread pool so the event loop stays free."""
-    loop = asyncio.get_event_loop()
-    return await loop.run_in_executor(None, verify_password, plain_password, hashed_password)
+    async with _BCRYPT_SEM:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, verify_password, plain_password, hashed_password)
 
 async def get_password_hash_async(password: str) -> str:
     """Non-blocking bcrypt hash — runs in a thread pool so the event loop stays free."""
-    loop = asyncio.get_event_loop()
-    return await loop.run_in_executor(None, get_password_hash, password)
+    async with _BCRYPT_SEM:
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, get_password_hash, password)
 
 def create_access_token(subject: Union[str, int], expires_delta: Optional[timedelta] = None) -> str:
     """Create a new access token."""

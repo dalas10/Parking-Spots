@@ -22,6 +22,15 @@ router = APIRouter()
 
 SERVICE_FEE_PERCENT = 0.10  # 10% service fee
 
+async def _load_booking(db: AsyncSession, booking_id) -> Booking:
+    """Re-fetch booking with all relationships so response serialization never hits lazy-load."""
+    result = await db.execute(
+        select(Booking)
+        .where(Booking.id == booking_id)
+        .options(selectinload(Booking.parking_spot))
+    )
+    return result.scalar_one()
+
 def calculate_booking_price(hourly_rate: int, daily_rate: int | None, start: datetime, end: datetime) -> dict:
     """Calculate booking price based on duration."""
     duration = end - start
@@ -295,7 +304,11 @@ async def update_booking_status(
     db: AsyncSession = Depends(get_db)
 ):
     """Update booking status (for owners/admins)."""
-    result = await db.execute(select(Booking).where(Booking.id == booking_id))
+    result = await db.execute(
+        select(Booking)
+        .where(Booking.id == booking_id)
+        .options(selectinload(Booking.parking_spot))
+    )
     booking = result.scalar_one_or_none()
     
     if not booking:
@@ -329,9 +342,8 @@ async def update_booking_status(
     
     booking.status = status_update.status
     await db.flush()
-    await db.refresh(booking)
     
-    return booking
+    return await _load_booking(db, booking.id)
 
 @router.post("/{booking_id}/check-in", response_model=BookingResponse)
 async def check_in(
@@ -340,7 +352,11 @@ async def check_in(
     db: AsyncSession = Depends(get_db)
 ):
     """Check in to a booking."""
-    result = await db.execute(select(Booking).where(Booking.id == booking_id))
+    result = await db.execute(
+        select(Booking)
+        .where(Booking.id == booking_id)
+        .options(selectinload(Booking.parking_spot))
+    )
     booking = result.scalar_one_or_none()
     
     if not booking:
@@ -365,9 +381,8 @@ async def check_in(
     booking.checked_in_at = datetime.now(timezone.utc)
     
     await db.flush()
-    await db.refresh(booking)
     
-    return booking
+    return await _load_booking(db, booking.id)
 
 @router.post("/{booking_id}/check-out", response_model=BookingResponse)
 async def check_out(
@@ -376,7 +391,11 @@ async def check_out(
     db: AsyncSession = Depends(get_db)
 ):
     """Check out from a booking."""
-    result = await db.execute(select(Booking).where(Booking.id == booking_id))
+    result = await db.execute(
+        select(Booking)
+        .where(Booking.id == booking_id)
+        .options(selectinload(Booking.parking_spot))
+    )
     booking = result.scalar_one_or_none()
     
     if not booking:
@@ -409,6 +428,5 @@ async def check_out(
         spot.total_bookings += 1
     
     await db.flush()
-    await db.refresh(booking)
     
-    return booking
+    return await _load_booking(db, booking.id)
