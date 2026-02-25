@@ -10,7 +10,7 @@ from app.schemas.user import (
     RefreshTokenRequest, PasswordReset
 )
 from app.core.security import (
-    get_password_hash, verify_password, 
+    get_password_hash_async, verify_password_async,
     create_access_token, create_refresh_token, decode_token
 )
 
@@ -32,7 +32,7 @@ async def register(user_in: UserCreate, db: AsyncSession = Depends(get_db)):
     # Create new user
     user = User(
         email=user_in.email,
-        hashed_password=get_password_hash(user_in.password),
+        hashed_password=await get_password_hash_async(user_in.password),
         full_name=user_in.full_name,
         phone_number=user_in.phone_number,
         role=user_in.role
@@ -50,7 +50,7 @@ async def login(login_data: LoginRequest, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(User).where(User.email == login_data.email))
     user = result.scalar_one_or_none()
     
-    if not user or not verify_password(login_data.password, user.hashed_password):
+    if not user or not await verify_password_async(login_data.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",

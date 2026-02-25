@@ -6,7 +6,7 @@ from app.db.session import get_db
 from app.models.user import User
 from app.schemas.user import UserResponse, UserUpdate, PasswordChange
 from app.api.deps import get_current_user
-from app.core.security import verify_password, get_password_hash
+from app.core.security import verify_password_async, get_password_hash_async
 
 router = APIRouter()
 
@@ -39,13 +39,13 @@ async def change_password(
     db: AsyncSession = Depends(get_db)
 ):
     """Change current user password."""
-    if not verify_password(password_data.current_password, current_user.hashed_password):
+    if not await verify_password_async(password_data.current_password, current_user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Incorrect current password"
         )
     
-    current_user.hashed_password = get_password_hash(password_data.new_password)
+    current_user.hashed_password = await get_password_hash_async(password_data.new_password)
     
     return {"message": "Password changed successfully"}
 
