@@ -54,9 +54,9 @@ async def main():
 
         # (no cleanup needed — unique time window chosen below)
 
-        # -- Time window: 7 days from now, 10:00-12:00 (avoids any existing bookings)
+        # -- Time window: 21 days from now, 10:00-12:00 (clean slot for each test run)
         from datetime import datetime, timezone, timedelta
-        target_day = datetime.now(timezone.utc) + timedelta(days=14)
+        target_day = datetime.now(timezone.utc) + timedelta(days=21)
         start = target_day.replace(hour=10, minute=0, second=0, microsecond=0).isoformat()
         end   = target_day.replace(hour=12, minute=0, second=0, microsecond=0).isoformat()
         print(f"Time window   : {start[:16]} → {end[:16]} UTC")
