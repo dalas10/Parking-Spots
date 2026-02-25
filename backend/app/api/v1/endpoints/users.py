@@ -27,7 +27,7 @@ async def update_current_user(
     for field, value in update_data.items():
         setattr(current_user, field, value)
     
-    await db.commit()
+    await db.flush()
     await db.refresh(current_user)
     
     return current_user
@@ -46,7 +46,6 @@ async def change_password(
         )
     
     current_user.hashed_password = get_password_hash(password_data.new_password)
-    await db.commit()
     
     return {"message": "Password changed successfully"}
 
@@ -71,6 +70,5 @@ async def delete_current_user(
 ):
     """Delete current user account."""
     current_user.is_active = False
-    await db.commit()
     
     return {"message": "Account deactivated successfully"}

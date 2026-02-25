@@ -39,7 +39,7 @@ async def register(user_in: UserCreate, db: AsyncSession = Depends(get_db)):
     )
     
     db.add(user)
-    await db.commit()
+    await db.flush()
     await db.refresh(user)
     
     return user

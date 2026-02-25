@@ -92,7 +92,7 @@ async def create_review(
         spot.average_rating = round(new_avg, 2)
         spot.total_reviews = new_count
     
-    await db.commit()
+    await db.flush()
     await db.refresh(review)
     
     return review
@@ -220,7 +220,7 @@ async def update_review(
     for field, value in update_data.items():
         setattr(review, field, value)
     
-    await db.commit()
+    await db.flush()
     await db.refresh(review)
     
     return review
@@ -258,7 +258,7 @@ async def add_owner_response(
     review.owner_response = response_data.response
     review.owner_responded_at = datetime.utcnow().isoformat()
     
-    await db.commit()
+    await db.flush()
     await db.refresh(review)
     
     return review
@@ -280,7 +280,6 @@ async def mark_review_helpful(
         )
     
     review.helpful_count += 1
-    await db.commit()
     
     return {"message": "Review marked as helpful", "helpful_count": review.helpful_count}
 
@@ -307,6 +306,5 @@ async def delete_review(
         )
     
     await db.delete(review)
-    await db.commit()
     
     return {"message": "Review deleted successfully"}

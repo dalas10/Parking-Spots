@@ -47,7 +47,7 @@ async def create_parking_spot(
     )
     
     db.add(spot)
-    await db.commit()
+    await db.flush()
     await db.refresh(spot)
     
     return spot
@@ -439,7 +439,7 @@ async def update_parking_spot(
     for field, value in update_data.items():
         setattr(spot, field, value)
     
-    await db.commit()
+    await db.flush()
     await db.refresh(spot)
     
     # Invalidate cache for this spot and search results
@@ -470,7 +470,6 @@ async def delete_parking_spot(
         )
     
     await db.delete(spot)
-    await db.commit()
     
     # Invalidate cache for this spot and search results
     await invalidate_spot_cache(spot_id)
@@ -507,7 +506,7 @@ async def add_availability_slot(
     )
     
     db.add(slot)
-    await db.commit()
+    await db.flush()
     await db.refresh(slot)
     
     return slot
@@ -555,6 +554,5 @@ async def delete_availability_slot(
         )
     
     await db.delete(slot)
-    await db.commit()
     
     return {"message": "Availability slot deleted"}

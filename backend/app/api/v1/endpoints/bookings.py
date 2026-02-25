@@ -328,7 +328,7 @@ async def update_booking_status(
             )
     
     booking.status = status_update.status
-    await db.commit()
+    await db.flush()
     await db.refresh(booking)
     
     return booking
@@ -364,7 +364,7 @@ async def check_in(
     booking.status = BookingStatus.IN_PROGRESS
     booking.checked_in_at = datetime.now(timezone.utc)
     
-    await db.commit()
+    await db.flush()
     await db.refresh(booking)
     
     return booking
@@ -408,7 +408,7 @@ async def check_out(
     if spot:
         spot.total_bookings += 1
     
-    await db.commit()
+    await db.flush()
     await db.refresh(booking)
     
     return booking

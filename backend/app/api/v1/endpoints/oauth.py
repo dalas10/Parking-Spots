@@ -85,7 +85,7 @@ async def google_auth(
                 user.profile_image = profile_image
             if email_verified and not user.is_verified:
                 user.is_verified = True
-            await db.commit()
+            await db.flush()
             await db.refresh(user)
     else:
         # Create new user
@@ -102,7 +102,7 @@ async def google_auth(
             hashed_password=None  # No password for OAuth users
         )
         db.add(user)
-        await db.commit()
+        await db.flush()
         await db.refresh(user)
     
     # Generate tokens

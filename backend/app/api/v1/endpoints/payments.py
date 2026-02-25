@@ -59,7 +59,7 @@ async def create_payment_intent(
                 metadata={"user_id": str(current_user.id)}
             )
             current_user.stripe_customer_id = customer.id
-            await db.commit()
+            await db.flush()
         
         # Create payment intent
         intent = stripe.PaymentIntent.create(
@@ -86,7 +86,7 @@ async def create_payment_intent(
         )
         db.add(payment)
         
-        await db.commit()
+        await db.flush()
         
         return PaymentIntentResponse(
             client_secret=intent.client_secret,
@@ -146,7 +146,7 @@ async def confirm_payment(
             booking.status = BookingStatus.CONFIRMED
             booking.payment_status = "paid"
         
-        await db.commit()
+        await db.flush()
         
         return {"message": "Payment confirmed", "status": "succeeded"}
     
@@ -181,7 +181,7 @@ async def stripe_webhook(request: Request, db: AsyncSession = Depends(get_db)):
         payment = result.scalar_one_or_none()
         if payment:
             payment.status = PaymentStatus.SUCCEEDED
-            await db.commit()
+            await db.flush()
     
     elif event["type"] == "payment_intent.payment_failed":
         intent = event["data"]["object"]
@@ -191,7 +191,7 @@ async def stripe_webhook(request: Request, db: AsyncSession = Depends(get_db)):
         payment = result.scalar_one_or_none()
         if payment:
             payment.status = PaymentStatus.FAILED
-            await db.commit()
+            await db.flush()
     
     return {"status": "success"}
 
@@ -245,7 +245,7 @@ async def create_refund(
         # Update booking status
         booking.status = BookingStatus.REFUNDED if refund_amount == payment.amount else BookingStatus.CANCELLED
         
-        await db.commit()
+        await db.flush()
         await db.refresh(payment)
         
         return RefundResponse(
