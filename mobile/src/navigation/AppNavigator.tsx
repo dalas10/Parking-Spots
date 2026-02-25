@@ -14,6 +14,8 @@ import { HomeScreen } from '../screens/home/HomeScreen';
 import { SearchScreen } from '../screens/search/SearchScreen';
 import { ParkingSpotDetailScreen } from '../screens/parking/ParkingSpotDetailScreen';
 import { BookingsScreen } from '../screens/bookings/BookingsScreen';
+import { BookingCreateScreen } from '../screens/bookings/BookingCreateScreen';
+import { BookingDetailScreen } from '../screens/bookings/BookingDetailScreen';
 import { ProfileScreen } from '../screens/profile/ProfileScreen';
 import { Colors } from '../constants/colors';
 
@@ -48,6 +50,11 @@ const HomeStack = () => (
       component={ParkingSpotDetailScreen}
       options={{ title: 'Parking Spot' }}
     />
+    <Stack.Screen
+      name="BookingCreate"
+      component={BookingCreateScreen}
+      options={{ title: 'Book this Spot' }}
+    />
   </Stack.Navigator>
 );
 
@@ -57,6 +64,11 @@ const BookingsStack = () => (
       name="BookingsMain"
       component={BookingsScreen}
       options={{ title: 'My Bookings' }}
+    />
+    <Stack.Screen
+      name="BookingDetail"
+      component={BookingDetailScreen}
+      options={{ title: 'Booking Details' }}
     />
   </Stack.Navigator>
 );

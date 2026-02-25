@@ -1,6 +1,37 @@
 // Spot details page
 let currentSpot = null;
 
+function showBookingError(msg) {
+    let el = document.getElementById('bookingError');
+    if (!el) {
+        el = document.createElement('div');
+        el.id = 'bookingError';
+        el.style.cssText = 'margin:0.75rem 0;padding:0.75rem 1rem;background:#fee2e2;color:#991b1b;border-radius:0.5rem;font-size:0.9rem;';
+        const btn = document.getElementById('btnBook');
+        if (btn) btn.parentNode.insertBefore(el, btn);
+    }
+    el.textContent = '⚠️ ' + msg;
+    el.style.display = 'block';
+}
+
+function clearBookingError() {
+    const el = document.getElementById('bookingError');
+    if (el) el.style.display = 'none';
+}
+
+function showBookingSuccess(msg) {
+    let el = document.getElementById('bookingError');
+    if (!el) {
+        el = document.createElement('div');
+        el.id = 'bookingError';
+        const btn = document.getElementById('btnBook');
+        if (btn) btn.parentNode.insertBefore(el, btn);
+    }
+    el.style.cssText = 'margin:0.75rem 0;padding:0.75rem 1rem;background:#dcfce7;color:#166534;border-radius:0.5rem;font-size:0.9rem;';
+    el.textContent = '✅ ' + msg;
+    el.style.display = 'block';
+}
+
 // Helper function to format date to date input format (YYYY-MM-DD)
 function formatDate(date) {
     const year = date.getFullYear();
@@ -43,10 +74,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 startTimeEl.value = filterTime;
                 durationEl.value = filterDuration;
             } else {
-                // Use current date/time as default with 1 hour duration
-                const now = new Date();
-                startDateEl.value = formatDate(now);
-                startTimeEl.value = formatTime(now);
+                // Default to now + 15 minutes so it's never accidentally in the past on submit
+                const soon = new Date(Date.now() + 15 * 60 * 1000);
+                startDateEl.value = formatDate(soon);
+                startTimeEl.value = formatTime(soon);
                 durationEl.value = '1';
             }
             
@@ -255,9 +286,16 @@ async function handleBooking(e) {
     const endDateTime = new Date(startDateTime);
     endDateTime.setHours(endDateTime.getHours() + durationHours);
     
+    // Front-end guard: reject if start time is in the past
+    if (startDateTime < new Date()) {
+        showBookingError('Start time is in the past. Please select a future time.');
+        return;
+    }
+
     const btnBook = document.getElementById('btnBook');
     btnBook.disabled = true;
     btnBook.textContent = 'Processing...';
+    clearBookingError();
     
     try {
         const booking = await createBooking({
@@ -270,12 +308,19 @@ async function handleBooking(e) {
             vehicle_color: vehicleColor
         });
         
-        alert('Booking successful! Redirecting to your bookings...');
-        window.location.href = 'bookings.html';
+        showBookingSuccess('Booking confirmed! Redirecting to your bookings...');
+        setTimeout(() => window.location.href = 'bookings.html', 1500);
         
     } catch (error) {
         console.error('Booking error:', error);
-        alert('Booking failed: ' + error.message);
+        const msg = error.message || 'Booking failed. Please try again.';
+        // Map known API errors to friendly messages
+        const friendly = msg.includes('already booked') || msg.includes('Conflict')
+            ? 'This spot is already booked for that time. Please choose a different time.'
+            : msg.includes('past')
+            ? 'Start time is in the past. Please select a future time.'
+            : msg;
+        showBookingError(friendly);
         btnBook.disabled = false;
         btnBook.textContent = 'Book Now';
     }

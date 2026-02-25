@@ -185,6 +185,14 @@ async def create_booking(
     await db.commit()
     await db.refresh(booking)
     
+    # Reload with relationships so the response serializes correctly
+    result = await db.execute(
+        select(Booking)
+        .where(Booking.id == booking.id)
+        .options(selectinload(Booking.parking_spot))
+    )
+    booking = result.scalar_one()
+    
     # Invalidate cache since booking affects availability
     await invalidate_spot_cache(str(booking_in.parking_spot_id))
     

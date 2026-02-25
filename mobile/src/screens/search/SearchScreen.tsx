@@ -60,7 +60,7 @@ export const SearchScreen: React.FC<SearchScreenProps> = ({ navigation }) => {
       params.is_covered = true;
     }
     
-    // Date/time filters
+    // Date/time filters — only include when user explicitly enables them
     if (useDateTime) {
       params.start_time = startDate.toISOString();
       params.end_time = endDate.toISOString();

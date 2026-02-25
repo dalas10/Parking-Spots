@@ -36,9 +36,9 @@ class ParkingSpot(Base, TimestampMixin):
     # Location
     address = Column(String(500), nullable=False)
     city = Column(String(100), nullable=False)
-    state = Column(String(100), nullable=False)
+    prefecture = Column(String(100), nullable=False)
     zip_code = Column(String(20), nullable=False)
-    country = Column(String(100), default="USA")
+    country = Column(String(100), default="Greece")
     latitude = Column(Float, nullable=False)
     longitude = Column(Float, nullable=False)
     

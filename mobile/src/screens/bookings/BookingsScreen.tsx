@@ -58,7 +58,7 @@ export const BookingsScreen: React.FC<BookingsScreenProps> = ({ navigation }) =>
     navigation.navigate('BookingDetail', { bookingId });
   };
 
-  const formatPrice = (cents: number) => `$${(cents / 100).toFixed(2)}`;
+  const formatPrice = (cents: number) => `€${(cents / 100).toFixed(2)}`;
 
   const getStatusColor = (status: BookingStatus) => {
     switch (status) {

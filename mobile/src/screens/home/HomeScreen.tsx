@@ -8,7 +8,7 @@ import {
   FlatList,
   ActivityIndicator,
 } from 'react-native';
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { useParkingSpotStore } from '../../stores';
 import { ParkingSpotListItem } from '../../types';
@@ -63,7 +63,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   };
 
   const formatPrice = (cents: number) => {
-    return `$${(cents / 100).toFixed(2)}`;
+    return `€${(cents / 100).toFixed(2)}`;
   };
 
   const renderSpotCard = ({ item }: { item: ParkingSpotListItem }) => (
@@ -102,7 +102,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       <MapView
         ref={mapRef}
         style={styles.map}
-        provider={PROVIDER_GOOGLE}
         showsUserLocation
         showsMyLocationButton
         initialRegion={
@@ -113,8 +112,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                 longitudeDelta: 0.05,
               }
             : {
-                latitude: 40.7128,
-                longitude: -74.006,
+                latitude: 37.787,
+                longitude: 20.8999,
                 latitudeDelta: 0.1,
                 longitudeDelta: 0.1,
               }

@@ -11,7 +11,7 @@ export interface ParkingSpot {
   vehicle_size: VehicleSize;
   address: string;
   city: string;
-  state: string;
+  prefecture: string;
   zip_code: string;
   country: string;
   latitude: number;
@@ -41,7 +41,7 @@ export interface ParkingSpotListItem {
   title: string;
   address: string;
   city: string;
-  state: string;
+  prefecture: string;
   latitude: number;
   longitude: number;
   hourly_rate: number;
@@ -60,7 +60,7 @@ export interface ParkingSpotCreate {
   vehicle_size: VehicleSize;
   address: string;
   city: string;
-  state: string;
+  prefecture: string;
   zip_code: string;
   country?: string;
   latitude: number;

@@ -56,7 +56,7 @@ async def create_parking_spot(
 async def search_parking_spots(
     q: Optional[str] = Query(None, description="General search query (searches title, address, city)"),
     city: Optional[str] = None,
-    state: Optional[str] = None,
+    prefecture: Optional[str] = None,
     zip_code: Optional[str] = None,
     spot_type: Optional[str] = None,
     vehicle_size: Optional[VehicleSize] = None,
@@ -94,8 +94,8 @@ async def search_parking_spots(
     # Apply filters
     if city:
         query = query.where(func.lower(ParkingSpot.city).like(f"%{city.lower()}%"))
-    if state:
-        query = query.where(func.lower(ParkingSpot.state).like(f"%{state.lower()}%"))
+    if prefecture:
+        query = query.where(func.lower(ParkingSpot.prefecture).like(f"%{prefecture.lower()}%"))
     if zip_code:
         query = query.where(ParkingSpot.zip_code == zip_code)
     if spot_type:
@@ -149,7 +149,7 @@ async def search_parking_spots(
             "title": spot.title,
             "address": spot.address,
             "city": spot.city,
-            "state": spot.state,
+            "prefecture": spot.prefecture,
             "latitude": spot.latitude,
             "longitude": spot.longitude,
             "hourly_rate": spot.hourly_rate,
@@ -274,12 +274,7 @@ async def list_parking_spots(
     result = await db.execute(query)
     spots = result.scalars().all()
     
-    # Default to next 1 hour availability if no time range provided
-    if not start_time and not end_time:
-        start_time = datetime.utcnow()
-        end_time = start_time + timedelta(hours=1)
-    
-    # Filter by availability (always check for conflicts)
+    # Only filter by availability when the caller explicitly provides a time range
     if start_time and end_time:
         available_spots = []
         for spot in spots:
@@ -310,7 +305,7 @@ async def list_parking_spots(
             "title": spot.title,
             "address": spot.address,
             "city": spot.city,
-            "state": spot.state,
+            "prefecture": spot.prefecture,
             "latitude": spot.latitude,
             "longitude": spot.longitude,
             "hourly_rate": spot.hourly_rate,
@@ -387,7 +382,7 @@ async def get_parking_spot(spot_id: str, db: AsyncSession = Depends(get_db)):
             "vehicle_size": spot.vehicle_size,
             "address": spot.address,
             "city": spot.city,
-            "state": spot.state,
+            "prefecture": spot.prefecture,
             "zip_code": spot.zip_code,
             "country": spot.country,
             "latitude": spot.latitude,

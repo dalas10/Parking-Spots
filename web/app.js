@@ -6,6 +6,8 @@ let currentFilters = {};
 let map = null;
 let markers = [];
 let currentView = 'map';
+let userLocation = null;   // { latitude, longitude } set by geolocation
+let dateFilterActive = false; // true only when user explicitly sets date/time filters
 
 // Load parking spots on page load
 document.addEventListener('DOMContentLoaded', () => {
@@ -15,16 +17,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const savedDuration = localStorage.getItem('filterDuration');
     
     if (savedDate && savedTime && savedDuration) {
-        // Restore saved filters
+        // Restore saved filters — user had explicitly chosen these before
         document.getElementById('filterStartDate').value = savedDate;
         document.getElementById('filterStartTime').value = savedTime;
         document.getElementById('filterDuration').value = savedDuration;
+        dateFilterActive = true;
     } else {
-        // Set default date/time filters to current time + 1 hour duration
+        // Pre-fill the inputs with sensible defaults but do NOT activate date filtering
+        // until the user explicitly clicks "Apply Filters"
         const now = new Date();
         document.getElementById('filterStartDate').value = now.toISOString().split('T')[0];
         document.getElementById('filterStartTime').value = now.toTimeString().slice(0, 5);
         document.getElementById('filterDuration').value = '1';
+        dateFilterActive = false;
     }
     
     // Add Enter key handler for search input
@@ -48,7 +53,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     initializeMap();
-    loadParkingSpots();
+
+    // Request geolocation; load spots once we know (or don't know) the position
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                userLocation = {
+                    latitude: pos.coords.latitude,
+                    longitude: pos.coords.longitude
+                };
+                // Pan map to user position
+                if (map) map.setView([userLocation.latitude, userLocation.longitude], 13);
+                loadParkingSpots();
+            },
+            () => {
+                // Permission denied or unavailable — load without location
+                loadParkingSpots();
+            }
+        );
+    } else {
+        loadParkingSpots();
+    }
 });
 
 // Reload dynamic content when language changes
@@ -164,6 +189,11 @@ function switchView(view) {
 
 // Apply filters function that works for both views
 function applyFilters() {
+    // Mark date filter as explicitly activated by the user
+    dateFilterActive = true;
+    localStorage.setItem('filterStartDate', document.getElementById('filterStartDate')?.value || '');
+    localStorage.setItem('filterStartTime', document.getElementById('filterStartTime')?.value || '');
+    localStorage.setItem('filterDuration', document.getElementById('filterDuration')?.value || '');
     loadParkingSpots();
 }
 
@@ -202,6 +232,9 @@ function clearFilters() {
     if (searchInput) {
         searchInput.value = '';
     }
+
+    // Reset date filter flag so we go back to "show all nearby" mode
+    dateFilterActive = false;
     
     console.log('Filters cleared, reloading spots...');
     
@@ -237,9 +270,16 @@ async function loadParkingSpots() {
             is_covered: document.getElementById('filterCovered')?.checked || undefined,
             limit: 50
         };
+
+        // Pass user's location so the API returns nearby spots sorted by distance
+        if (userLocation) {
+            filters.latitude = userLocation.latitude;
+            filters.longitude = userLocation.longitude;
+            filters.radius_km = 20;
+        }
         
-        // Add start_time and calculate end_time if all values are provided
-        if (startDate && startTime && duration) {
+        // Only add time params when the user has actively applied date filters
+        if (dateFilterActive && startDate && startTime && duration) {
             const startDateTime = new Date(`${startDate}T${startTime}`);
             filters.start_time = startDateTime.toISOString();
             

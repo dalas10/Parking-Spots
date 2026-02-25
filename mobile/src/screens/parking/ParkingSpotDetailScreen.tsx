@@ -34,7 +34,7 @@ export const ParkingSpotDetailScreen: React.FC<ParkingSpotDetailScreenProps> = (
     getSpotDetails(spotId);
   }, [spotId]);
 
-  const formatPrice = (cents: number) => `$${(cents / 100).toFixed(2)}`;
+  const formatPrice = (cents: number) => `€${(cents / 100).toFixed(2)}`;
 
   const handleBookNow = () => {
     navigation.navigate('BookingCreate', { spotId });
@@ -113,7 +113,7 @@ export const ParkingSpotDetailScreen: React.FC<ParkingSpotDetailScreenProps> = (
 
           {/* Address */}
           <Text style={styles.address}>
-            {spot.address}, {spot.city}, {spot.state} {spot.zip_code}
+            {spot.address}, {spot.city}, {spot.prefecture} {spot.zip_code}
           </Text>
 
           {/* Pricing */}

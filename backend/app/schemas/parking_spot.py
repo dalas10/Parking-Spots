@@ -13,9 +13,9 @@ class ParkingSpotBase(BaseModel):
     
     address: str = Field(..., min_length=5, max_length=500)
     city: str = Field(..., min_length=2, max_length=100)
-    state: str = Field(..., min_length=2, max_length=100)
+    prefecture: str = Field(..., min_length=2, max_length=100)
     zip_code: str = Field(..., min_length=3, max_length=20)
-    country: str = "USA"
+    country: str = "Greece"
     latitude: float = Field(..., ge=-90, le=90)
     longitude: float = Field(..., ge=-180, le=180)
     
@@ -74,7 +74,7 @@ class ParkingSpotListResponse(BaseModel):
     title: str
     address: str
     city: str
-    state: str
+    prefecture: str
     latitude: float
     longitude: float
     hourly_rate: int
